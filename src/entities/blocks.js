@@ -1,167 +1,80 @@
-class Block {
+class Block extends MovingEntity {
   constructor(x, y, type) {
+    super(x, y);
     this.type = type;
-    this.x = x;
-    this.y = y;
     this.dx = random(-1, 1);
     this.width = 80;
     this.height = 5;
   }
+}
+
+class NormalBlock extends Block {
+  constructor(x, y, type) {
+    super(x, y, type);
+  }
 
   show() {
-    noStroke();
+    fill(40, 100, 20, 120);
+    rect(this.x + 2, this.y + 2, this.width, this.height, 20);
 
-    if (this.type === "normal") {
-      fill(40, 100, 20, 120);
-      rect(this.x + 2, this.y + 2, this.width, this.height, 20);
+    fill(80, 200, 40);
+    rect(this.x, this.y, this.width, this.height, 20);
 
-      fill(80, 200, 40);
-      rect(this.x, this.y, this.width, this.height, 20);
+    fill(120, 240, 80);
+    rect(this.x, this.y - 2, this.width, 4, 20);
 
-      fill(120, 240, 80);
-      rect(this.x, this.y - 2, this.width, 4, 20);
+    fill(50, 180, 30);
+    rect(
+      this.x,
+      this.y + this.height - this.height * 2 * 0.8,
+      this.width,
+      this.height,
+      20,
+    );
+    fill(60, 180, 30);
 
-      fill(50, 180, 30);
-      rect(
-        this.x,
-        this.y + this.height - this.height * 2 * 0.8,
-        this.width,
-        this.height,
-        20,
+    for (let i = 6; i < this.width; i += 12) {
+      triangle(
+        this.x + i,
+        this.y,
+        this.x + i + 3,
+        this.y - 5,
+        this.x + i + 6,
+        this.y,
       );
-      fill(60, 180, 30);
-
-      for (let i = 6; i < this.width; i += 12) {
-        triangle(
-          this.x + i,
-          this.y,
-          this.x + i + 3,
-          this.y - 5,
-          this.x + i + 6,
-          this.y,
-        );
-      }
     }
+  }
+}
 
-    if (this.type === "moving") {
-      fill(93, 63, 211);
-      rect(this.x, this.y, this.width, this.height, 20);
+class MovingBlock extends Block {
+  constructor(x, y, type) {
+    super(x, y, type);
+  }
 
-      fill(140, 100, 255);
-      rect(this.x, this.y - 2, this.width, 4, 20);
+  show() {
+    fill(93, 63, 211);
+    rect(this.x, this.y, this.width, this.height, 20);
 
-      fill(25, 25, 112);
-      rect(
-        this.x,
-        this.y + this.height - this.height * 2 * 0.8,
-        this.width,
-        this.height,
-      );
+    fill(140, 100, 255);
+    rect(this.x, this.y - 2, this.width, 4, 20);
 
-      fill(255);
-      textAlign(CENTER, CENTER);
-      textSize(12);
-      text("◄ ►", this.x + this.width / 2, this.y + this.height / 2);
-    }
+    fill(25, 25, 112);
+    rect(
+      this.x,
+      this.y + this.height - this.height * 2 * 0.8,
+      this.width,
+      this.height,
+    );
 
-    if (this.type === "jump") {
-      fill(255, 70, 70);
-      rect(this.x, this.y, this.width, this.height, 20);
-
-      fill(255, 40, 40);
-      rect(
-        this.x,
-        this.y + this.height - this.height * 2 * 0.8,
-        this.width,
-        this.height,
-      );
-
-      stroke(255);
-      strokeWeight(2);
-
-      for (let i = 0; i < 5; i++) {
-        line(
-          this.x + 15 + i * 10,
-          this.y + 2,
-          this.x + 20 + i * 10,
-          this.y + 8,
-        );
-
-        line(
-          this.x + 20 + i * 10,
-          this.y + 8,
-          this.x + 25 + i * 10,
-          this.y + 2,
-        );
-      }
-
-      noStroke();
-    }
-
-    if (this.type === "brittle") {
-      let sizeBrittle = 4;
-
-      fill(165, 42, 42);
-      rect(this.x, this.y, this.width, this.height, 20);
-
-      fill(128, 0, 32);
-      rect(
-        this.x,
-        this.y + this.height - this.height * 2 * 0.8,
-        this.width,
-        this.height,
-      );
-
-      fill(233, 116, 81);
-      rect(
-        this.x + this.width / 2 - sizeBrittle / 2,
-        this.y - sizeBrittle,
-        sizeBrittle,
-        this.height + sizeBrittle,
-        20,
-      );
-
-      stroke(70);
-
-      line(this.x + 15, this.y, this.x + 25, this.y + 8);
-      line(this.x + 25, this.y + 8, this.x + 18, this.y + 10);
-
-      line(this.x + 40, this.y, this.x + 48, this.y + 7);
-      line(this.x + 48, this.y + 7, this.x + 55, this.y + 2);
-
-      noStroke();
-    }
-
-    if (this.type === "freeze") {
-      fill(0, 71, 171);
-      rect(this.x, this.y, this.width, this.height, 20);
-
-      fill(120, 220, 255);
-      rect(this.x, this.y - 2, this.width, 4, 20);
-
-      fill(0, 149, 237);
-      rect(
-        this.x,
-        this.y + this.height - this.height * 2 * 0.8,
-        this.width,
-        this.height,
-      );
-
-      fill(255, 180);
-      circle(this.x + 12, this.y + 3, 3);
-      circle(this.x + 40, this.y + 5, 2);
-      circle(this.x + 60, this.y + 2, 4);
-    }
-
-    stroke(255, 80);
-    line(this.x + 5, this.y + 2, this.x + this.width - 5, this.y + 2);
-
-    noStroke();
+    fill(255);
+    textAlign(CENTER, CENTER);
+    textSize(12);
+    text("◄ ►", this.x + this.width / 2, this.y + this.height / 2);
   }
 
   update() {
     if (this.type === "moving") {
-      if (this.colision()) {
+      if (this.colisionWithWall()) {
         this.dx *= -1;
       }
 
@@ -169,12 +82,105 @@ class Block {
     }
   }
 
-  colision() {
+  colisionWithWall() {
     return this.x + this.width >= width || this.x <= 0;
   }
+}
 
-  isOffScreen() {
-    return this.y > height;
+class JumpBlock extends Block {
+  constructor(x, y, type) {
+    super(x, y, type);
+  }
+
+  show() {
+    fill(255, 70, 70);
+    rect(this.x, this.y, this.width, this.height, 20);
+
+    fill(255, 40, 40);
+    rect(
+      this.x,
+      this.y + this.height - this.height * 2 * 0.8,
+      this.width,
+      this.height,
+    );
+
+    stroke(255);
+    strokeWeight(2);
+
+    for (let i = 0; i < 5; i++) {
+      line(this.x + 15 + i * 10, this.y + 2, this.x + 20 + i * 10, this.y + 8);
+
+      line(this.x + 20 + i * 10, this.y + 8, this.x + 25 + i * 10, this.y + 2);
+    }
+
+    noStroke();
+  }
+}
+
+class BrittleBlock extends Block {
+  constructor(x, y, type) {
+    super(x, y, type);
+  }
+
+  show() {
+    let sizeBrittle = 4;
+
+    fill(165, 42, 42);
+    rect(this.x, this.y, this.width, this.height, 20);
+
+    fill(128, 0, 32);
+    rect(
+      this.x,
+      this.y + this.height - this.height * 2 * 0.8,
+      this.width,
+      this.height,
+    );
+
+    fill(233, 116, 81);
+    rect(
+      this.x + this.width / 2 - sizeBrittle / 2,
+      this.y - sizeBrittle,
+      sizeBrittle,
+      this.height + sizeBrittle,
+      20,
+    );
+
+    stroke(70);
+
+    line(this.x + 15, this.y, this.x + 25, this.y + 8);
+    line(this.x + 25, this.y + 8, this.x + 18, this.y + 10);
+
+    line(this.x + 40, this.y, this.x + 48, this.y + 7);
+    line(this.x + 48, this.y + 7, this.x + 55, this.y + 2);
+
+    noStroke();
+  }
+}
+
+class FreezeBlock extends Block {
+  constructor(x, y, type) {
+    super(x, y, type);
+  }
+
+  show() {
+    fill(0, 71, 171);
+    rect(this.x, this.y, this.width, this.height, 20);
+
+    fill(120, 220, 255);
+    rect(this.x, this.y - 2, this.width, 4, 20);
+
+    fill(0, 149, 237);
+    rect(
+      this.x,
+      this.y + this.height - this.height * 2 * 0.8,
+      this.width,
+      this.height,
+    );
+
+    fill(255, 180);
+    circle(this.x + 12, this.y + 3, 3);
+    circle(this.x + 40, this.y + 5, 2);
+    circle(this.x + 60, this.y + 2, 4);
   }
 }
 
@@ -202,7 +208,7 @@ function createInitialBlock() {
       y -= random(80, 120);
     }
 
-    blocks.push(new Block(lastBlockX, y, "normal"));
+    blocks.push(createTypeBlock(lastBlockX, y, "normal"));
   }
 }
 
@@ -243,29 +249,6 @@ function updateBlock() {
   });
 
   generateBlocksByPlayer();
-}
-
-function drawBlock(block) {
-  let sizeBrittle = 4;
-
-  fill(165, 42, 42);
-  rect(block.x, block.y, block.width, block.height);
-
-  fill(128, 0, 32);
-  rect(
-    block.x,
-    block.y + block.height - block.height * 2 * 0.8,
-    block.width,
-    block.height,
-  );
-
-  fill(233, 116, 81);
-  rect(
-    block.x + block.width / 2 - sizeBrittle / 2,
-    block.y - sizeBrittle,
-    sizeBrittle,
-    block.height + sizeBrittle,
-  );
 }
 
 function brokeBlock(block) {
@@ -420,10 +403,32 @@ function createNewBlock() {
   lastBlockType = type;
 
   if (random() < 0.2) {
-    coins.push(new Coin(x + random(10, 60), y - 25));
+    createCoin(x + random(-10, 10), y - 20);
   }
 
-  blocks.push(new Block(x, y, type));
-  
-  createEnemies(type,x);
+  blocks.push(createTypeBlock(lastBlockX, y, type));
+
+  createEnemies(type, x);
+}
+
+function createTypeBlock(x, y, type) {
+  switch (type) {
+    case "normal":
+      return new NormalBlock(x, y, type);
+
+    case "moving":
+      return new MovingBlock(x, y, type);
+
+    case "jump":
+      return new JumpBlock(x, y, type);
+
+    case "brittle":
+      return new BrittleBlock(x, y, type);
+
+    case "freeze":
+      return new FreezeBlock(x, y, type);
+
+    default:
+      return new NormalBlock(x, y, type);
+  }
 }

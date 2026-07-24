@@ -1,7 +1,6 @@
-class Card {
-  constructor(x, y, size) {
-    this.x = x;
-    this.y = y;
+class Card extends Entity {
+  constructor(x,y,size) {
+    super(x,y)
     this.sizeX = size;
     this.sizeY = size * 1.2;
     this.getRandomCard();

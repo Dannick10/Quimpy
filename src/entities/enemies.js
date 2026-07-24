@@ -1,212 +1,165 @@
-class Enemy {
-  constructor(x, y, type) {
-    this.x = x;
-    this.y = y;
-    this.dy = 0;
-    this.dx = 0;
-    this.type = type ?? this.generateType();
-    this.angle = 0;
-    this.angleDegress = 1;
-    this.size = this.getSize();
+class Enemy extends AnimatedEntity {
+  constructor(x, y, size) {
+    super(x, y, FRAME_W, FRAME_H);
+    this.size = size;
+    this.width = size;
+    this.height = size;
     this.isDead = false;
     this.isDying = false;
-    this.baseColor = this.getColor();
+    this.baseColor = color(255);
+    this.collisionType = "box";
+    this.angle = 0;
+    this.isRoaring = false;
+    this.roarTimer = 80;
+  }
+
+  show() {}
+
+  update() {}
+
+  updateAnimation() {
+    let animation = "fly";
+
+    if (this.isDying) {
+      animation = "dead";
+    } else if (this.isRoaring) {
+      animation = "roar";
+    }
+
+    this.setAnimation(animation);
+    this.updateDirection();
+    this.updateSprite();
+  }
+
+  die() {
+    if (this.isDying) return;
+    this.isDying = true;
+    this.frame = 0;
+    this.frameTimer = 0;
+    hitKillSound.play();
+
+    numTotalEnemyDie++;
+
+    addScore(this.type);
+
+    createParticle(
+      this.x + this.size / 2,
+      this.y + this.size / 2,
+      this.size,
+      this.baseColor,
+      { min: -2, max: 2 },
+      { min: -2, max: 5 },
+      this.size * 0.5,
+      this.size * 0.5,
+      "enemyDeath",
+    );
+  }
+
+  isOffScreen() {
+    return this.y > height;
+  }
+}
+
+class FlyingEnemy extends Enemy {
+  constructor(x, y) {
+    super(x, y, random(100, 128));
+    this.type = "flying";
+    this.baseColor = color(100, 149, 237);
     this.moveTimer = 0;
     this.targetX = x;
     this.targetY = y;
-    this.velocityX = 0;
-    this.velocityY = 0;
-    this.warning = this.type === "bigBall";
-    this.warningTime = 60;
-    this.lockToScreen = this.type === "bigBall";
-    this.frame = 0;
-    this.frameTimer = 0;
-    this.frameSpeed = 10;
-    this.maxFrames = 4;
-    this.animation = "idle";
-    this.roarTimer = 80;
-    this.direction;
-    this.updateAnimation();
-  }
-
-  generateType() {
-    let type;
-    this.size = random(40, 50);
-
-    if (random(1) > 0.5) {
-      type = "bigBall";
-    } else {
-      type = "flying";
-    }
-
-    return type;
-  }
-
-  getSize() {
-    let size;
-
-    switch (this.type) {
-      case "flying":
-        size = random(100, 128);
-        break;
-      case "bigBall":
-        size = random(70, 100);
-        break;
-      default:
-        break;
-    }
-
-    return size;
-  }
-
-  getColor() {
-    return this.type === "flying" ? color(100, 149, 237) : color(140);
   }
 
   show() {
-    if (this.type === "flying") {
-      push();
-
-      translate(this.x, this.y);
-
-      if (this.direction == -1) {
-        scale(-1, 1);
-      }
-
-      rotate(this.angle);
-
-      let row = 0;
-
-      switch (this.animation) {
-        case "fly":
-          row = 0;
-          break;
-
-        case "roar":
-          row = 1;
-          break;
-
-        case "dead":
-          row = 2;
-          break;
-      }
-
-      image(
-        enemySprite,
-        -this.size / 2,
-        -this.size / 2,
-        this.size,
-        this.size,
-        this.frame * FRAME_W,
-        row * FRAME_H,
-        FRAME_W,
-        FRAME_H,
-      );
-
-      pop();
-    }
-
-    if (this.type === "bigBall" && this.warning) {
-      push();
-
-      translate(this.x, 60);
-
-      let pulse = 1 + sin(frameCount * 0.3) * 0.15;
-      scale(pulse);
-
-      fill(255, 70, 70);
-      noStroke();
-
-      triangle(-20, 0, 20, 0, 0, 40);
-
-      pop();
-    }
-
-    if (this.type === "bigBall") {
-      push();
-
-      translate(this.x, this.y);
-
-      rotate(this.angle);
-
-      let row = 0;
-
-      if (this.isDying) {
-        row = 2;
-      } else if (this.warning) {
-        row = 1;
-      } else {
-        row = 0;
-      }
-
-      image(
-        enemySprite2,
-        -this.size / 2,
-        -this.size / 2,
-        this.size,
-        this.size,
-        this.bigBallFrame * FRAME_W,
-        row * FRAME_H,
-        FRAME_W,
-        FRAME_H,
-      );
-
-      pop();
-    }
+    let row = 0;
+    if (this.isDying) row = 2;
+    else if (this.isRoaring) row = 1;
+    this.drawSprite(enemySprite, FRAME_W, FRAME_H, row);
   }
 
   update() {
-    if (this.velocityX > 0.1) {
-      this.direction = 1;
-    } else if (this.velocityX < -0.1) {
-      this.direction = -1;
+    this.moveTimer--;
+
+    if (this.moveTimer <= 0) {
+      this.targetX = random(30, width - 30);
+      this.targetY = this.y + random(-80, 80);
+      this.moveTimer = random(40, 100);
     }
 
-    if (this.type === "flying") {
-      this.moveTimer--;
+    let forceX = (this.targetX - this.x) * 0.001;
+    let forceY = (this.targetY - this.y) * 0.001;
 
-      if (this.moveTimer <= 0) {
-        this.targetX = random(30, width - 30);
-        this.targetY = this.y + random(-80, 80);
+    this.dx += forceX;
+    this.dy += forceY;
 
-        this.moveTimer = random(40, 100);
-      }
+    this.dx = constrain(this.dx, -1.2, 1.2);
+    this.dy = constrain(this.dy, -1.2, 1.2);
 
-      let forceX = (this.targetX - this.x) * 0.001;
-      let forceY = (this.targetY - this.y) * 0.001;
+    this.x += this.dx;
+    this.y += this.dy;
 
-      this.velocityX += forceX;
-      this.velocityY += forceY;
+    this.angle += sin(frameCount * 0.1) * 0.02;
 
-      this.velocityX = constrain(this.velocityX, -1.2, 1.2);
-      this.velocityY = constrain(this.velocityY, -1.2, 1.2);
+    if (random(1, 540) > 539) {
+      monsterScream_Sound.play();
 
-      this.x += this.velocityX;
-      this.y += this.velocityY;
-
-      this.angle += sin(frameCount * 0.1) * 0.02;
-
-      if (this.x < 20 || this.x > width - 20) {
-        this.velocityX *= -1;
-      }
-
-      if (random(1, 540) > 539) {
-        monsterScream_Sound.play();
-        this.isRoaring = true;
-        this.roarTimer = 80;
-      }
-
-      if (this.isRoaring) {
-        this.roarTimer--;
-
-        if (this.roarTimer <= 0) {
-          this.isRoaring = false;
-        }
-      }
+      this.isRoaring = true;
+      this.roarTimer = 80;
     }
 
+    if (this.isRoaring) {
+      this.roarTimer--;
+
+      if (this.roarTimer <= 0) this.isRoaring = false;
+    }
+
+    this.updateAnimation();
+
+    if (
+      this.isDying &&
+      this.frame == this.maxFrames - 1 &&
+      this.frameTimer == 0
+    ) {
+      this.isDead = true;
+    }
+  }
+}
+
+class BigBallEnemy extends Enemy {
+  constructor(x, y) {
+    super(x, y, random(70, 100));
+    this.type = "bigBall";
+    this.collisionType = "circle";
+    this.baseColor = color(140);
+    this.dx = random(-2, 2);
+    this.warning = true;
+    this.warningTime = 60;
+    this.lockToScreen = true;
+  }
+
+  show() {
+    if (this.warning) {
+      push();
+
+      translate(this.x, 60);
+      let pulse = 1 + sin(frameCount * 0.3) * 0.15;
+      scale(pulse);
+      fill(255, 70, 70);
+      noStroke();
+      triangle(-20, 0, 20, 0, 0, 40);
+      pop();
+    }
+
+    let row = 0;
+
+    if (this.isDying) row = 2;
+    else if (this.warning) row = 1;
+
+    this.drawSprite(enemySprite2, FRAME_W, FRAME_H, row, "center");
+  }
+
+  update() {
     if (this.warning && this.lockToScreen) {
-      this.x = this.x;
       this.y = player.y - 300;
 
       this.warningTime--;
@@ -214,33 +167,22 @@ class Enemy {
       if (this.warningTime <= 0) {
         this.warning = false;
         this.lockToScreen = false;
-        this.dy = 0;
       }
 
       return;
     }
 
-    if (this.type === "bigBall") {
-      this.dy += player.gravity;
+    this.dy += player.gravity;
+    this.angle += this.dx * 0.1;
 
-      if (this.dx === 0) {
-        this.dx = random(-2, 2);
-      }
-
-      this.angleDegress = this.dx;
-      this.angle += this.angleDegress * 0.1;
-
-      if (this.x - this.size / 2 <= 0 || this.x + this.size / 2 >= width) {
-        this.dx *= -1;
-      }
+    if (this.x - this.size / 2 <= 0 || this.x + this.size / 2 >= width) {
+      this.dx *= -1;
     }
 
-    if (player.dy < 0) {
-      this.y += cameraSpeed;
-    }
+    if (player.dy < 0) this.y += cameraSpeed;
 
-    this.y += this.dy;
     this.x += this.dx;
+    this.y += this.dy;
 
     this.updateAnimation();
 
@@ -253,26 +195,8 @@ class Enemy {
     }
   }
 
-  updateAnimation() {
-    let newAnimation = "fly";
-
-    if (this.isDying) {
-      newAnimation = "dead";
-    } else if (this.isRoaring) {
-      newAnimation = "roar";
-    } else {
-      newAnimation = "fly";
-    }
-
-    changeAnimation(this, newAnimation);
-
-    updateSpriteAnimation(this);
-  }
-
   bigBallUpdate() {
-    for (let i = 0; i < blocks.length; i++) {
-      let block = blocks[i];
-
+    for (let block of blocks) {
       let ballBottom = this.y + this.size / 2;
       let previousBottom = ballBottom - this.dy;
 
@@ -283,19 +207,8 @@ class Enemy {
         this.x + this.size / 2 > block.x &&
         this.x - this.size / 2 < block.x + block.width
       ) {
-        let impactVelocity = this.dy;
-
         this.y = block.y - this.size / 2;
         this.dy = 0;
-
-        if (
-          impactVelocity > 6 &&
-          block.type !== "jump" &&
-          block.type !== "brittle" &&
-          this.type === "bigBall"
-        ) {
-          rock_Sound.play();
-        }
 
         if (block.type === "brittle") {
           brokeBlock(block);
@@ -310,31 +223,12 @@ class Enemy {
         if (block.type === "jump") {
           this.dy -= this.size * random(0.2, 0.4);
         }
-
-        if (block.type === "moving") {
-          this.dx += block.dx * 0.1;
-        }
       }
     }
   }
-
-  blockColision(obj) {
-    let w = obj.width ? obj.width : obj.size;
-    let h = obj.height ? obj.height : obj.size;
-    let closestX = constrain(this.x, obj.x, obj.x + w);
-    let closestY = constrain(this.y, obj.y, obj.y + h);
-
-    let distance = dist(this.x, this.y, closestX, closestY);
-
-    return distance < this.size / 2;
-  }
-
-  isOffScreen() {
-    return this.y > height;
-  }
 }
 
-function createEnemies(type,blockX) {
+function createEnemies(type, blockX) {
   if (type == "jump" || type == "brittle") {
     return;
   }
@@ -342,10 +236,14 @@ function createEnemies(type,blockX) {
   enemyCounter++;
 
   if (enemyCounter >= respawnEnemiesRate) {
-    let x = blockX + random(-50,50);
+    let x = blockX + random(-50, 50);
     let y = player.y - max(300, abs(player.dy) * 20);
 
-    enemies.push(new Enemy(x, y));
+    if (random(1) > 0.5) {
+      enemies.push(new FlyingEnemy(x, y));
+    } else {
+      enemies.push(new BigBallEnemy(x, y));
+    }
 
     enemyCounter = 0;
   }
@@ -367,7 +265,9 @@ function updateEnemies() {
   for (let i = 0; i < enemies.length; i++) {
     enemies[i].show();
     enemies[i].update();
-    enemies[i].bigBallUpdate();
+    if (enemies[i].type === "bigBall") {
+      enemies[i].bigBallUpdate();
+    }
     player.colisionWithEnemy(enemies[i]);
   }
 
