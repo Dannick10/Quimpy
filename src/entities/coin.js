@@ -32,6 +32,8 @@ class Coin extends AnimatedEntity {
   }
 
   colision() {
+    if (this.isDying) return;
+
     this.animation = "die";
     money++;
     numTotalCoinCollect++;
@@ -40,7 +42,7 @@ class Coin extends AnimatedEntity {
       money++;
     }
 
-    coinCollect_Sound.play();
+    playSound(coinCollect_Sound);
 
     createParticle(
       this.x,
@@ -76,7 +78,7 @@ function buyCard(card) {
 
   numTotalCardsCollect++;
 
-  buyCard_Sound.play();
+  playSound(buyCard_Sound);
 }
 
 function updateCoins() {

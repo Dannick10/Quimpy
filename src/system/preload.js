@@ -18,6 +18,12 @@ let inital_Sound;
 let card_Sound;
 
 
+function playSound(sound, allowOverlap = false) {
+  if (!sound || !settings.sound) return;
+  if (!allowOverlap && sound.isPlaying()) return;
+  sound.play();
+}
+
 let playerSprite;
 let enemySprite;
 let enemySprite2;

@@ -1,3 +1,35 @@
+function playBackgroundMusic(sound) {
+  if (!sound) return;
+
+  if (!settings.sound) {
+    if (currentBGM && currentBGM.isPlaying()) {
+      currentBGM.stop();
+    }
+    currentBGM = null;
+    return;
+  }
+
+  if (currentBGM === sound && sound.isPlaying()) return;
+
+  if (currentBGM && currentBGM.isPlaying()) {
+    currentBGM.stop();
+  }
+
+  currentBGM = sound;
+
+  if (!sound.isPlaying()) {
+    sound.loop();
+  }
+}
+
+function updateBackgroundMusic() {
+  if (gameState === "playing") {
+    playBackgroundMusic(music_Sound);
+  } else {
+    playBackgroundMusic(audioMenu_Sound);
+  }
+}
+
 function setup() {
   let sizeScreen = constrain(windowWidth, 200, 615);
   let canvas = createCanvas(sizeScreen, windowHeight);
@@ -84,11 +116,9 @@ function setup() {
 }
 
 function draw() {
+  updateBackgroundMusic();
+
   if (gameState === "menu") {
-    if (!audioMenu_Sound.isPlaying()) {
-      audioMenu_Sound.loop();
-      music_Sound.stop();
-    }
     drawMenu();
     return;
   }
@@ -102,16 +132,8 @@ function draw() {
     background(220, 250, 250);
     drawBackground();
 
-    if (audioMenu_Sound.isPlaying()) audioMenu_Sound.stop();
-    if (!music_Sound.isPlaying()) music_Sound.loop();
-
     if (player.hasGameOver) {
       gameState = "gameover";
-
-      if (music_Sound.isPlaying()) {
-        music_Sound.stop();
-      }
-
       return;
     }
 
@@ -145,7 +167,5 @@ function draw() {
     background(220, 250, 250);
     drawBackground();
     gameOver();
-    if (!audioMenu_Sound.isPlaying()) audioMenu_Sound.loop();
-    if (music_Sound.isPlaying()) music_Sound.stop();
   }
 }

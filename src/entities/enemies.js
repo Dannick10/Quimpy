@@ -36,7 +36,7 @@ class Enemy extends AnimatedEntity {
     this.isDying = true;
     this.frame = 0;
     this.frameTimer = 0;
-    hitKillSound.play();
+    playSound(hitKillSound);
 
     numTotalEnemyDie++;
 
@@ -101,7 +101,7 @@ class FlyingEnemy extends Enemy {
     this.angle += sin(frameCount * 0.1) * 0.02;
 
     if (random(1, 540) > 539) {
-      monsterScream_Sound.play();
+      playSound(monsterScream_Sound);
 
       this.isRoaring = true;
       this.roarTimer = 80;
@@ -212,12 +212,12 @@ class BigBallEnemy extends Enemy {
 
         if (block.type === "brittle") {
           brokeBlock(block);
-          wood_surface.play();
+          playSound(wood_surface);
         }
 
         if (block.type === "freeze") {
           brokeBlock(block);
-          grassBreak_Sound.play();
+          playSound(grassBreak_Sound);
         }
 
         if (block.type === "jump") {

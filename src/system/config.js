@@ -54,6 +54,8 @@ const FRAME_H = 64;
 
 let gameState = "menu";
 
+let currentBGM = null;
+
 let settings = {
   sound: true,
   control: "keyboard",

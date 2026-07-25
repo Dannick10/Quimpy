@@ -97,17 +97,17 @@ function touchStarted() {
     for (let touch of touches) {
       if (dist(touch.x, touch.y, 80, height - 100) < 40) {
         actionMobile.left = true;
-        click_Sound.play();
+        playSound(click_Sound);
       }
 
       if (dist(touch.x, touch.y, 200, height - 100) < 40) {
         actionMobile.right = true;
-        click_Sound.play();
+        playSound(click_Sound);
       }
 
       if (dist(touch.x, touch.y, 140, height - 180) < 40 && player) {
         player.jump();
-        click_Sound.play();
+        playSound(click_Sound);
       }
     }
   } else {
@@ -179,7 +179,7 @@ function checkInteraction(tx, ty) {
   for (let btn of activeButtons) {
     if (hitBox(btn.x, btn.y, btn.w, btn.h)) {
       btn.action();
-      click_Sound.play();
+      playSound(click_Sound);
       return;
     }
   }

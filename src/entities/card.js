@@ -128,7 +128,7 @@ class Card extends Entity {
 }
 
 function createCards() {
-  card_Sound.play();
+  playSound(card_Sound);
   cards = [];
   let num = 3;
   let s = constrain(width * 0.28, 140, 220);

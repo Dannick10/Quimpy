@@ -136,7 +136,7 @@ class Player extends AnimatedEntity {
 
     this.updateAnimation();
 
-    failed_Sound.play();
+    playSound(failed_Sound);
   }
 
   colisionWithEnemy(enemy) {
@@ -167,7 +167,7 @@ class Player extends AnimatedEntity {
 
       if (this.powerSystem.shouldDieOnCollision()) {
         this.die();
-        monsterScream_Sound.play();
+        playSound(monsterScream_Sound);
         enemy.isRoaring = true;
         enemy.roarTimer = 80;
       }
@@ -199,7 +199,7 @@ class Player extends AnimatedEntity {
         if (block.type === "brittle") {
           if (!this.powerSystem.isDashing()) {
             brokeBlock(block);
-            wood_surface.play();
+            playSound(wood_surface);
           }
         }
 
@@ -216,7 +216,7 @@ class Player extends AnimatedEntity {
 
         if (block.type === "jump") {
           this.boost(JUMP_PLATFORM_BOOST);
-          jump_longSound.play();
+          playSound(jump_longSound);
         }
       }
     }
@@ -226,17 +226,17 @@ class Player extends AnimatedEntity {
     let colorParticleBlock;
 
     if (block.type === "normal") {
-      plants_impactSound.play();
+      playSound(plants_impactSound);
       colorParticleBlock = color(50, 20, 20);
     } else if (block.type === "moving") {
       colorParticleBlock = color(4, 55, 242);
-      groundMove_Sound.play();
+      playSound(groundMove_Sound);
     } else if (block.type === "brittle") {
       colorParticleBlock = color(128, 0, 0);
     } else if (block.type === "jump") {
       colorParticleBlock = color(210, 4, 45);
     } else if (block.type === "freeze") {
-      grassPress_Sound.play();
+      playSound(grassPress_Sound);
       colorParticleBlock = color(173, 216, 230);
     }
 
@@ -267,7 +267,7 @@ function updatePlayer() {
     player.y = height - player.height;
     player.dy = 0;
     player.die();
-    failed_Sound.play();
+    playSound(failed_Sound);
   }
 
   let target = height * 0.35;
@@ -304,9 +304,9 @@ function keyPressed() {
 
     if (player.canJump) {
       if (speed <= 5) {
-        jump_cuteSound.play();
+        playSound(jump_cuteSound);
       } else {
-        jump_longSound.play();
+        playSound(jump_longSound);
       }
 
       createParticle(
