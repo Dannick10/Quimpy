@@ -23,7 +23,7 @@ class MovingEntity extends Entity {
       this.x + this.width <= obj.x ||
       this.x >= obj.x + obj.width ||
       this.y + this.height <= obj.y ||
-      this.y >= obj.y + obj.height
+      this.y + this.height / 2 >= obj.y + obj.height 
     );
   }
 

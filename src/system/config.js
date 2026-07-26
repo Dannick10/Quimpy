@@ -63,3 +63,30 @@ let settings = {
   autoJump: false,
 };
 
+let inventoryState = {
+  categories: ["Skin", "Hat", "Clothes"],
+  categoryIndex: 0,
+  page: 0,
+  perPage: 4,
+  columns: 1,
+  selected: {
+    skin: "default",
+    hat: "none",
+    clothes: "default",
+  },
+  items: {
+    Skin: [
+      { id: "default", label: "Quimpy", spriteKey: "playerSprite" },
+      { id: "alt", label: "lith", spriteKey: "playerSpriteAlt" },
+    ],
+    Hat: [
+      { id: "none", label: "Sem Chapéu", spriteKey: null },
+      { id: "hat1", label: "Chapéu de Mágico", spriteKey: "hatSprite" },
+      { id: "hat2", label: "Chapéu de Bruxo", spriteKey: "hatSprite2" },
+    ],
+    Clothes: [
+      { id: "none", label: "Sem Roupa", spriteKey: null },
+      { id: "clothesSprite", label: "Traje de Bruxo", spriteKey: "clothesSprite" },
+    ],
+  },
+};

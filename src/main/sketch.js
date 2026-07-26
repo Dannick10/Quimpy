@@ -34,6 +34,9 @@ function setup() {
   let sizeScreen = constrain(windowWidth, 200, 615);
   let canvas = createCanvas(sizeScreen, windowHeight);
 
+  pixelDensity(1);
+  noSmooth();
+
   audioMenu_Sound.setLoop(true);
   music_Sound.setLoop(true);
 
@@ -120,6 +123,11 @@ function draw() {
 
   if (gameState === "menu") {
     drawMenu();
+    return;
+  }
+
+  if (gameState === "inventory") {
+    drawInventary();
     return;
   }
 

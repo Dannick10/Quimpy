@@ -6,6 +6,11 @@ class Player extends AnimatedEntity {
     this.isDead = false;
     this.canJump = true;
     this.powerSystem = powerSystem;
+    this.customization = {
+      skin: inventoryState?.selected?.skin || "default",
+      hat: inventoryState?.selected?.hat || "none",
+      clothes: inventoryState?.selected?.clothes || "default",
+    };
     this.deathTimer = 0;
     this.deathDuration = 100;
     this.autoJumpTimer = 0;
@@ -16,7 +21,7 @@ class Player extends AnimatedEntity {
 
   show() {
     let row = 0;
-    
+
     switch (this.animation) {
       case "idle":
         row = 0;
@@ -35,8 +40,153 @@ class Player extends AnimatedEntity {
         break;
     }
 
-    this.drawSprite(playerSprite, FRAME_W, FRAME_H, row);
+    this.drawSprite(this.getSkinSprite(), FRAME_W, FRAME_H, row);
     this.powerSystem.draw(this);
+    this.drawClotches();
+    this.drawHat();
+  }
+
+  getSkinSprite() {
+    return this.customization.skin === "alt" && playerSpriteAlt
+      ? playerSpriteAlt
+      : playerSprite;
+  }
+
+  setCustomization(category, itemId) {
+    if (!this.customization) return;
+    this.customization[category] = itemId;
+  }
+
+  getClotchesSprite() {
+    switch (this.customization.clothes) {
+      case "clothesSprite":
+        return clothesSprite;
+      default:
+        return null;
+    }
+  }
+
+  getHatSprite(hat) {
+    switch (hat || this.customization.hat) {
+      case "hat1":
+        return hatSprite;
+      case "hat2":
+        return hatSprite2;
+      default:
+        return null;
+    }
+  }
+
+  drawClotches() {
+    const clotchesImage = this.getClotchesSprite();
+    if (!clotchesImage) return;
+
+    push();
+    translate(this.x + this.width / 2, this.y);
+
+    if (this.direction === -1) {
+      scale(-1, 1);
+    }
+
+    image(
+      clotchesImage,
+      -(this.width / 2) + 10,
+      -(this.height / 2) + 55,
+      this.width * 0.8,
+      this.height * 0.8,
+      this.frame * FRAME_W,
+      0,
+      FRAME_W,
+      FRAME_H,
+    );
+    pop();
+  }
+
+  drawHat() {
+    const hatImage = this.getHatSprite();
+    if (!hatImage) return;
+
+    push();
+    translate(this.x + this.width / 2, this.y);
+
+    if (this.direction === 1) {
+      scale(-1, 1);
+    }
+
+    image(
+      hatImage,
+      -this.width / 2  - 5,
+      -(this.height / 2) + 5,
+      this.width * 0.9,
+      this.height * 0.9,
+      this.frame * FRAME_W,
+      0,
+      FRAME_W,
+      FRAME_H,
+    );
+    pop();
+  }
+
+  drawCustomizationPreview(x, y, size) {
+    this.updateAnimation()
+    push();
+    translate(x, y);
+
+    imageMode(CENTER);
+
+    const previewScale = size / FRAME_W;
+
+    scale(previewScale);
+
+    image(
+      this.getSkinSprite(),
+      0,
+      0,
+      FRAME_W,
+      FRAME_H,
+      this.frame * FRAME_W,
+      0,
+      FRAME_W,
+      FRAME_H,
+    );
+
+
+    const clothesImage = this.getClotchesSprite();
+
+    if (clothesImage) {
+      image(
+        clothesImage,
+        5,
+        18,
+        FRAME_W * .8,
+        FRAME_H * .8,
+        this.frame * FRAME_W,
+        0,
+        FRAME_W,
+        FRAME_H,
+      );
+    }
+
+
+    const hatImage = this.getHatSprite();
+    scale(-1,1)
+    if (hatImage) {
+      image(
+        hatImage,
+        -5,
+        -30,
+        FRAME_W * .8,
+        FRAME_H * .8,
+        this.frame * FRAME_W,
+        0,
+        FRAME_W,
+        FRAME_H,
+      );
+    }
+
+    imageMode(CORNER);
+
+    pop();
   }
 
   handleInput(targetSpeed) {
@@ -93,7 +243,7 @@ class Player extends AnimatedEntity {
     }
 
     this.updateAnimation();
-    this.powerSystem.update()
+    this.powerSystem.update();
   }
 
   updateAnimation() {
