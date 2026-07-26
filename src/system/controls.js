@@ -88,7 +88,7 @@ function getInventoryButtons() {
     {
       text: "VOLTAR",
       x: width / 2,
-      y: width / 2 + 240,
+      y: 550,
       w: 330,
       h: 68,
       action: () => {
