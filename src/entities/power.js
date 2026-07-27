@@ -17,6 +17,7 @@ class PowerSystem {
       coin_2x: 30000,
     };
   }
+
   activatePower(powerName) {
     if (powerName === "shield") {
       this.effects.shieldActive = true;
@@ -70,6 +71,7 @@ class PowerSystem {
   getDashSpeed() {
     return this.effects.dashSpeed;
   }
+  
   update() {
     const now = millis();
     for (let [power, expireTime] of this.activePowers.entries()) {

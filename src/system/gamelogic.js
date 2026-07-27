@@ -50,7 +50,6 @@ function startGame() {
       icon: "↑",
     },
   };
-
   loop();
 }
 

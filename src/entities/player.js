@@ -203,6 +203,8 @@ class Player extends AnimatedEntity {
         return;
       }
 
+      if(this.powerSystem.isPowerActive("ghost")) return
+
       if (this.powerSystem.effects.shieldActive) {
         this.powerSystem.effects.shieldActive = false;
         enemy.die();
