@@ -63,30 +63,115 @@ let settings = {
   autoJump: false,
 };
 
+let customizationAssets = {};
+
 let inventoryState = {
-  categories: ["Skin", "Hat", "Clothes"],
+  categories: ["Skin"],
   categoryIndex: 0,
   page: 0,
   perPage: 4,
   columns: 1,
   selected: {
     skin: "default",
-    hat: "none",
-    clothes: "default",
   },
   items: {
     Skin: [
-      { id: "default", label: "Quimpy", spriteKey: "playerSprite" },
-      { id: "alt", label: "lith", spriteKey: "playerSpriteAlt" },
-    ],
-    Hat: [
-      { id: "none", label: "Sem Chapéu", spriteKey: null },
-      { id: "hat1", label: "Chapéu de Mágico", spriteKey: "hatSprite" },
-      { id: "hat2", label: "Chapéu de Bruxo", spriteKey: "hatSprite2" },
-    ],
-    Clothes: [
-      { id: "none", label: "Sem Roupa", spriteKey: null },
-      { id: "clothesSprite", label: "Traje de Bruxo", spriteKey: "clothesSprite" },
+      {
+        id: "default",
+        label: "Quimpy Clássico",
+        spriteKey: "playerSprite1",
+        assetKey: "playerSprite1",
+        assetPath: "sprites/customization/skin/player.png",
+      },
+      {
+        id: "pl2",
+        label: "Capitão Marujo",
+        spriteKey: "playerSprite2",
+        assetKey: "playerSprite2",
+        assetPath: "sprites/customization/skin/playerSprite2.png",
+      },
+      {
+        id: "pl3",
+        label: "Bruxo Arcano",
+        spriteKey: "player3Sprite",
+        assetKey: "player3Sprite",
+        assetPath: "sprites/customization/skin/playerSprite3.png",
+      },
+      {
+        id: "pl4",
+        label: "Princesa Encantada",
+        spriteKey: "player4Sprite",
+        assetKey: "player4Sprite",
+        assetPath: "sprites/customization/skin/playerSprite4.png",
+      },
+      {
+        id: "pl5",
+        label: "Cavaleiro Real",
+        spriteKey: "player5Sprite",
+        assetKey: "player5Sprite",
+        assetPath: "sprites/customization/skin/playerSprite5.png",
+      },
+      {
+        id: "pl6",
+        label: "Guerreiro Nórdico",
+        spriteKey: "player6Sprite",
+        assetKey: "player6Sprite",
+        assetPath: "sprites/customization/skin/playerSprite6.png",
+      },
+      {
+        id: "pl7",
+        label: "Capitão Pirata",
+        spriteKey: "player7Sprite",
+        assetKey: "player7Sprite",
+        assetPath: "sprites/customization/skin/playerSprite7.png",
+      },
+      {
+        id: "pl8",
+        label: "Cientista Maluco",
+        spriteKey: "player8Sprite",
+        assetKey: "player8Sprite",
+        assetPath: "sprites/customization/skin/playerSprite8.png",
+      },
+      {
+        id: "pl9",
+        label: "Explorador Espacial",
+        spriteKey: "player9Sprite",
+        assetKey: "player9Sprite",
+        assetPath: "sprites/customization/skin/playerSprite9.png",
+      },
+      {
+        id: "pl10",
+        label: "Pato Aventureiro",
+        spriteKey: "player10Sprite",
+        assetKey: "player10Sprite",
+        assetPath: "sprites/customization/skin/playerSprite10.png",
+      },
+      {
+        id: "pl11",
+        label: "Gato do Campo",
+        spriteKey: "player11Sprite",
+        assetKey: "player11Sprite",
+        assetPath: "sprites/customization/skin/playerSprite11.png",
+      },
     ],
   },
 };
+
+function getInventoryCategoryKey(category) {
+  const normalizedCategory = (category || "").toLowerCase();
+  return normalizedCategory.charAt(0).toUpperCase() + normalizedCategory.slice(1);
+}
+
+function getInventoryItem(category, itemId) {
+  const categoryKey = getInventoryCategoryKey(category);
+  const items = inventoryState?.items?.[categoryKey] || [];
+  const normalizedItemId = itemId ?? "default";
+
+  return items.find((item) => item.id === normalizedItemId) || items[0] || null;
+}
+
+function getCustomizationAsset(category, itemId) {
+  const item = getInventoryItem(category, itemId);
+  if (!item?.assetKey) return null;
+  return customizationAssets[item.assetKey] || null;
+}

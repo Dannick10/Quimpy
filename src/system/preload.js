@@ -28,21 +28,31 @@ let enemySprite;
 let enemySprite2;
 let coinSprite;
 let blocksSprite;
-let hatSprite;
-let hatSprite2;
-let clothesSprite;
 
+function loadCustomizationAssets() {
+  const categories = inventoryState?.categories || [];
+
+  for (const category of categories) {
+    const items = inventoryState?.items?.[category] || [];
+
+    for (const item of items) {
+      if (!item?.assetKey || !item?.assetPath) continue;
+
+      const image = loadImage(item.assetPath);
+      customizationAssets[item.assetKey] = image;
+
+    
+    }
+  }
+}
 
 function preload() {
   backgroundQuimpy = loadImage("sprites/backgroundquimpy.png");
   enemySprite2 = loadImage("sprites/enemy/enemy2.png");
   enemySprite = loadImage("sprites/enemy/enemy1.png");
-  playerSprite = loadImage("sprites/customization/skin/player.png");
-  playerSpriteAlt = loadImage("sprites/customization/skin/player1.png");
   coinSprite = loadImage("sprites/coin.png");
-  hatSprite = loadImage("sprites/customization/hat/hatSprite.png");
-  hatSprite2 = loadImage("sprites/customization/hat/hatSprite2.png");
-  clothesSprite = loadImage("sprites/customization/clothes/clothesSprite.png")
+
+  loadCustomizationAssets();
 
   audioMenu_Sound = loadSound("sounds/audiomenu.mp3");
   card_Sound = loadSound("sounds/cardsound.mp3");

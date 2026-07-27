@@ -127,11 +127,11 @@ const gameOverUI = {
     }
 
     image(
-      playerSprite,
+    player.getSkinSprite(player.customization.skin),
       -25,
       -25,
-      50,
-      50,
+      80,
+      80,
       this.frame * FRAME_W,
       1 * FRAME_H,
       FRAME_W,
@@ -340,9 +340,12 @@ function drawInventoryOptions() {
     fill(40, 25, 10);
     circle(0, 0, 42);
 
-    if (getInventoryCategory() === "Skin") {
+    const category = getInventoryCategory().toLowerCase();
+    const customizationImage = player.getCustomizationSprite(category, item.id);
+
+    if (customizationImage) {
       image(
-        item.id === "alt" ? playerSpriteAlt : playerSprite,
+        customizationImage,
         -FRAME_W / 2,
         -FRAME_H / 2,
         FRAME_W,
@@ -352,42 +355,6 @@ function drawInventoryOptions() {
         FRAME_W,
         FRAME_H,
       );
-    }
-
-    if (getInventoryCategory() === "Hat") {
-      const hatImage = player.getHatSprite(item.id);
-
-      if (hatImage) {
-        image(
-          hatImage,
-          -FRAME_W / 2,
-          -FRAME_H / 2,
-          FRAME_W,
-          FRAME_H,
-          0,
-          0,
-          FRAME_W,
-          FRAME_H,
-        );
-      }
-    }
-
-    if (getInventoryCategory() === "Clothes") {
-      const clothesImage = item.id === "clothesSprite" ? clothesSprite : null;
-
-      if (clothesImage) {
-        image(
-          clothesImage,
-          -FRAME_W / 2,
-          -FRAME_H / 2,
-          FRAME_W,
-          FRAME_H,
-          0,
-          0,
-          FRAME_W,
-          FRAME_H,
-        );
-      }
     }
 
     pop();
