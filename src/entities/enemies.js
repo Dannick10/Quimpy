@@ -229,7 +229,7 @@ class BigBallEnemy extends Enemy {
 }
 
 function createEnemies(type, blockX) {
-  if (type == "jump" || type == "brittle") {
+  if (type == "jump" || type == "brittle" || settings.mode == "CASUAL") {
     return;
   }
 

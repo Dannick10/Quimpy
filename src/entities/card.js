@@ -1,6 +1,6 @@
 class Card extends Entity {
-  constructor(x,y,size) {
-    super(x,y)
+  constructor(x, y, size) {
+    super(x, y);
     this.sizeX = size;
     this.sizeY = size * 1.2;
     this.getRandomCard();
@@ -128,6 +128,7 @@ class Card extends Entity {
 }
 
 function createCards() {
+  if (settings.mode == "CASUAL") return;
   playSound(card_Sound);
   cards = [];
   let num = 3;

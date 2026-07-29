@@ -126,13 +126,19 @@ function draw() {
     return;
   }
 
+  
   if (gameState === "inventory") {
     drawInventary();
     return;
   }
-
+  
   if (gameState === "settings") {
     drawSettings();
+    return;
+  }
+  
+  if (gameState === "mode") {
+    drawGameMode();
     return;
   }
 

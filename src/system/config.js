@@ -61,6 +61,7 @@ let settings = {
   control: "keyboard",
   mobileControl: "swipe",
   autoJump: false,
+  mode: "NORMAL",
 };
 
 let customizationAssets = {};
@@ -159,7 +160,9 @@ let inventoryState = {
 
 function getInventoryCategoryKey(category) {
   const normalizedCategory = (category || "").toLowerCase();
-  return normalizedCategory.charAt(0).toUpperCase() + normalizedCategory.slice(1);
+  return (
+    normalizedCategory.charAt(0).toUpperCase() + normalizedCategory.slice(1)
+  );
 }
 
 function getInventoryItem(category, itemId) {

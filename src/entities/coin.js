@@ -130,10 +130,12 @@ function updateCoins() {
 }
 
 function createCoin(x, y) {
+  if (settings.mode == "CASUAL") return;
   coins.push(new Coin(x + random(10, 60), y - 50));
 }
 
 function drawCoinHud() {
+  if (settings.mode == "CASUAL") return;
   push();
 
   noStroke();

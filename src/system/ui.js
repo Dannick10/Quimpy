@@ -127,7 +127,7 @@ const gameOverUI = {
     }
 
     image(
-    player.getSkinSprite(player.customization.skin),
+      player.getSkinSprite(player.customization.skin),
       -25,
       -25,
       80,
@@ -228,6 +228,15 @@ function drawSettings() {
   image(backgroundQuimpy, 0, 0, width, height);
 
   for (let btn of getSettingsButtons()) {
+    drawButton(btn.text, btn.x, btn.y);
+  }
+}
+
+function drawGameMode() {
+  background(15, 20, 35);
+  image(backgroundQuimpy, 0, 0, width, height);
+
+  for (let btn of getOptionGameMode()) {
     drawButton(btn.text, btn.x, btn.y);
   }
 }

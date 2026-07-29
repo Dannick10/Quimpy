@@ -7,7 +7,7 @@ function getMenuButtons() {
       w: 330,
       h: 68,
       action: () => {
-        gameState = "playing";
+        gameState = "mode";
         startGame();
       },
     },
@@ -100,6 +100,61 @@ function getInventoryButtons() {
   ];
 }
 
+function getGameOverButtons() {
+  return [
+    {
+      text: "REINICIAR",
+      x: width / 2,
+      y: height / 2 + 130,
+      w: 330,
+      h: 68,
+      action: () => {
+        gameState = "playing";
+        startGame();
+      },
+    },
+    {
+      text: "VOLTAR AO MENU",
+      x: width / 2,
+      y: height / 2 + 210,
+      w: 330,
+      h: 68,
+      action: () => {
+        gameState = "menu";
+      },
+    },
+  ];
+}
+
+function getOptionGameMode() {
+  return [
+    {
+      text: "NORMAL",
+      x: width / 2,
+      y: height / 2 - 100,
+      w: 330,
+      h: 68,
+      action: () => {
+        gameState = "playing";
+        settings.mode = "NORMAL";
+        startGame();
+      },
+    },
+    {
+      text: "CASUAL",
+      x: width / 2,
+      y: height / 2,
+      w: 330,
+      h: 68,
+      action: () => {
+        gameState = "playing";
+        settings.mode = "CASUAL";
+        startGame();
+      },
+    },
+  ];
+}
+
 function getInventoryScale() {
   return constrain(min(width / 615, height / 700), 0.65, 1);
 }
@@ -163,32 +218,6 @@ function getInventoryItemPosition(index) {
     row,
     col,
   };
-}
-
-function getGameOverButtons() {
-  return [
-    {
-      text: "REINICIAR",
-      x: width / 2,
-      y: height / 2 + 130,
-      w: 330,
-      h: 68,
-      action: () => {
-        gameState = "playing";
-        startGame();
-      },
-    },
-    {
-      text: "VOLTAR AO MENU",
-      x: width / 2,
-      y: height / 2 + 210,
-      w: 330,
-      h: 68,
-      action: () => {
-        gameState = "menu";
-      },
-    },
-  ];
 }
 
 function touchStarted() {
@@ -274,6 +303,8 @@ function checkInteraction(tx, ty) {
     activeButtons = getSettingsButtons();
   } else if (gameState === "inventory") {
     activeButtons = getInventoryButtons();
+  } else if (gameState === "mode") {
+    activeButtons = getOptionGameMode();
   } else if (player && player.hasGameOver) {
     activeButtons = getGameOverButtons();
   }
