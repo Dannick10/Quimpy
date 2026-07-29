@@ -152,6 +152,16 @@ function getOptionGameMode() {
         startGame();
       },
     },
+    {
+      text: "VOLTAR",
+      x: width / 2,
+      y: height / 2 + 100,
+      w: 330,
+      h: 68,
+      action: () => {
+        gameState = "menu";
+      },
+    },
   ];
 }
 
