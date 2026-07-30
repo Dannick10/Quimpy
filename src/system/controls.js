@@ -1,168 +1,151 @@
 function getMenuButtons() {
-  return [
-    {
-      text: "JOGAR",
-      x: width / 2,
-      y: height / 2 - 100,
-      w: 330,
-      h: 68,
-      action: () => {
-        gameState = "mode";
-        startGame();
+  return createButtonLayout(
+    [
+      {
+        text: "JOGAR",
+        action: () => {
+          gameState = "mode";
+          startGame();
+        },
+        template: buttonsTemplate.primary,
       },
-    },
-    {
-      text: "INVENTÁRIO",
-      x: width / 2,
-      y: height / 2,
-      w: 330,
-      h: 68,
-      action: () => {
-        gameState = "inventory";
+      {
+        text: "INVENTÁRIO",
+        action: () => {
+          gameState = "inventory";
+        },
+        template: buttonsTemplate.primary,
       },
-    },
-    {
-      text: "CONFIGURAÇÕES",
-      x: width / 2,
-      y: height / 2 + 100,
-      w: 330,
-      h: 68,
-      action: () => {
-        gameState = "settings";
+      {
+        text: "CONFIGURAÇÕES",
+        action: () => {
+          gameState = "settings";
+        },
+        template: buttonsTemplate.primary,
       },
-    },
-  ];
+    ],
+    {
+      gap: 100,
+    }
+  );
 }
 
 function getSettingsButtons() {
-  return [
+  return createButtonLayout([
     {
       text: "SOM: " + (settings.sound ? "ON" : "OFF"),
-      x: width / 2,
-      y: 200,
-      w: 330,
-      h: 68,
       action: () => {
         settings.sound = !settings.sound;
         outputVolume(settings.sound ? 0.1 : 0);
       },
+      template: settings.sound
+        ? buttonsTemplate.primary
+        : buttonsTemplate.secondary,
     },
     {
       text:
         "CONTROLE: " +
         (settings.mobileControl === "swipe" ? "DESLIZAR" : "BOTÕES"),
-      x: width / 2,
-      y: 300,
-      w: 330,
-      h: 68,
       action: () => {
         settings.mobileControl =
           settings.mobileControl === "swipe" ? "buttons" : "swipe";
       },
+      template:
+        settings.mobileControl === "swipe"
+          ? buttonsTemplate.primary
+          : buttonsTemplate.secondary,
     },
     {
       text: "PULO AUTOMÁTICO: " + (settings.autoJump ? "ON" : "OFF"),
-      x: width / 2,
-      y: 400,
-      w: 330,
-      h: 68,
       action: () => {
         settings.autoJump = !settings.autoJump;
       },
+      template: settings.autoJump
+        ? buttonsTemplate.primary
+        : buttonsTemplate.secondary,
     },
     {
       text: "VOLTAR",
-      x: width / 2,
-      y: 500,
-      w: 330,
-      h: 68,
       action: () => {
         gameState = "menu";
       },
+      template: buttonsTemplate.back,
     },
-  ];
+  ],{
+    gap:100,
+  })
 }
 
 function getInventoryButtons() {
-  return [
+  return createButtonLayout([
     {
       text: "VOLTAR",
-      x: width / 2,
-      y: 550,
-      w: 330,
-      h: 68,
       action: () => {
         gameState = "menu";
         inventoryState.categoryIndex = 0;
         inventoryState.page = 0;
       },
+      template: buttonsTemplate.back,
     },
-  ];
+  ],
+{
+ centerY: 550
+})
 }
 
 function getGameOverButtons() {
-  return [
+  return createButtonLayout([
     {
       text: "REINICIAR",
-      x: width / 2,
-      y: height / 2 + 130,
-      w: 330,
-      h: 68,
       action: () => {
         gameState = "playing";
         startGame();
       },
+      template: buttonsTemplate.primary,
     },
     {
       text: "VOLTAR AO MENU",
-      x: width / 2,
-      y: height / 2 + 210,
-      w: 330,
-      h: 68,
       action: () => {
         gameState = "menu";
       },
+      template: buttonsTemplate.back,
     },
-  ];
+  ], {
+ centerY: 480,
+ gap: 80
+  });
 }
 
 function getOptionGameMode() {
-  return [
+  return createButtonLayout([
     {
       text: "NORMAL",
-      x: width / 2,
-      y: height / 2 - 100,
-      w: 330,
-      h: 68,
       action: () => {
         gameState = "playing";
-        settings.mode = "NORMAL";
+        settings.dificulty = "NORMAL";
         startGame();
       },
+      template: buttonsTemplate.primary,
     },
     {
       text: "CASUAL",
-      x: width / 2,
-      y: height / 2,
-      w: 330,
-      h: 68,
       action: () => {
         gameState = "playing";
-        settings.mode = "CASUAL";
+        settings.dificulty = "CASUAL";
         startGame();
       },
+      template: buttonsTemplate.tertiary,
     },
     {
       text: "VOLTAR",
-      x: width / 2,
-      y: height / 2 + 100,
-      w: 330,
-      h: 68,
       action: () => {
         gameState = "menu";
       },
+      template: buttonsTemplate.back,
     },
-  ];
+  ], {
+    gap: 100
+  });
 }
 
 function getInventoryScale() {

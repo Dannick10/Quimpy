@@ -61,7 +61,8 @@ let settings = {
   control: "keyboard",
   mobileControl: "swipe",
   autoJump: false,
-  mode: "NORMAL",
+  dificulty: "NORMAL",
+  mode: "RUN",
 };
 
 let customizationAssets = {};
@@ -158,6 +159,45 @@ let inventoryState = {
   },
 };
 
+let buttonsTemplate = {
+  primary: {
+    shadow: [45, 25, 10, 180],
+    border: [70, 40, 15],
+    background: [110, 65, 20],
+    button: [255, 190, 55],
+    hover: [255, 215, 80],
+    highlight: [255, 245, 180, 90],
+    text: [70, 35, 5],
+  },
+  secondary: {
+    shadow: [20, 25, 30, 180],
+    border: [45, 55, 65],
+    background: [65, 75, 85],
+    button: [120, 135, 150],
+    hover: [145, 160, 175],
+    highlight: [225, 235, 245, 80],
+    text: [30, 40, 50],
+  },
+  tertiary: {
+    shadow: [10, 25, 35, 200],
+    border: [20, 55, 70],
+    background: [30, 85, 105],
+    button: [45, 155, 180],
+    hover: [65, 185, 210],
+    highlight: [210, 245, 255, 90],
+    text: [10, 40, 50],
+  },
+  back: {
+    shadow: [40, 15, 15, 180],
+    border: [70, 25, 28],
+    background: [95, 35, 38],
+    button: [175, 65, 70],
+    hover: [205, 85, 90],
+    highlight: [255, 220, 220, 80],
+    text: [60, 20, 22],
+  },
+};
+
 function getInventoryCategoryKey(category) {
   const normalizedCategory = (category || "").toLowerCase();
   return (
@@ -177,4 +217,25 @@ function getCustomizationAsset(category, itemId) {
   const item = getInventoryItem(category, itemId);
   if (!item?.assetKey) return null;
   return customizationAssets[item.assetKey] || null;
+}
+
+function createButtonLayout(buttons, options = {}) {
+  const {
+    centerX = width / 2,
+    centerY = height / 2,
+    gap = 100,
+    buttonW = 330,
+    buttonH = 68,
+  } = options;
+
+  const totalHeight = (buttons.length - 1) * gap;
+  const startY = centerY - totalHeight / 2;
+
+  return buttons.map((button, index) => ({
+    ...button,
+    x: centerX,
+    y: startY + index * gap,
+    w: buttonW,
+    h: buttonH,
+  }));
 }

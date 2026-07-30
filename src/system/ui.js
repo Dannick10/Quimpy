@@ -33,11 +33,11 @@ function drawMenu() {
   image(backgroundQuimpy, 0, 0, width, height);
 
   for (let btn of getMenuButtons()) {
-    drawButton(btn.text, btn.x, btn.y);
+    drawButton(btn.text, btn.x, btn.y, btn.template);
   }
 }
 
-function drawButton(texto, x, y) {
+function drawButton(texto, x, y, colors = buttonsTemplate.primary) {
   const w = 330;
   const h = 68;
 
@@ -52,22 +52,22 @@ function drawButton(texto, x, y) {
   let offset = hover && mouseIsPressed ? 2 : 0;
 
   noStroke();
-  fill(35, 20, 15, 180);
+  fill(...colors.shadow);
   rect(x + 5, y + 6, w, h, 10);
 
   strokeWeight(4);
-  stroke(55, 35, 20);
-  fill(90, 55, 25);
+  stroke(...colors.border);
+  fill(...colors.background);
   rect(x, y + offset, w, h, 10);
 
   noStroke();
-  fill(hover ? color(255, 210, 90) : color(240, 180, 70));
+  fill(...(hover ? colors.hover : colors.button));
   rect(x, y - 4 + offset, w - 8, h - 10, 8);
 
-  fill(255, 240, 170, 80);
+  fill(...colors.highlight);
   rect(x, y - 16 + offset, w - 20, 12, 5);
 
-  fill(60, 30, 10);
+  fill(...colors.text);
   textAlign(CENTER, CENTER);
   textSize(26);
   textStyle(BOLD);
@@ -217,7 +217,7 @@ function gameOver() {
   }
 
   for (let btn of getGameOverButtons()) {
-    drawButton(btn.text, btn.x, btn.y);
+    drawButton(btn.text, btn.x, btn.y,  btn.template);
   }
 
   rectMode(CORNER);
@@ -228,7 +228,7 @@ function drawSettings() {
   image(backgroundQuimpy, 0, 0, width, height);
 
   for (let btn of getSettingsButtons()) {
-    drawButton(btn.text, btn.x, btn.y);
+    drawButton(btn.text, btn.x, btn.y,  btn.template);
   }
 }
 
@@ -237,7 +237,7 @@ function drawGameMode() {
   image(backgroundQuimpy, 0, 0, width, height);
 
   for (let btn of getOptionGameMode()) {
-    drawButton(btn.text, btn.x, btn.y);
+    drawButton(btn.text, btn.x, btn.y,  btn.template);
   }
 }
 
@@ -278,7 +278,7 @@ function drawInventary() {
   pop();
 
   for (let btn of getInventoryButtons()) {
-    drawButton(btn.text, btn.x, btn.y);
+    drawButton(btn.text, btn.x, btn.y,  btn.template);
   }
 }
 
