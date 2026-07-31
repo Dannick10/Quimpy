@@ -61,8 +61,7 @@ let settings = {
   control: "keyboard",
   mobileControl: "swipe",
   autoJump: false,
-  dificulty: "NORMAL",
-  mode: "RUN",
+  MODE: "NORMAL",
 };
 
 let customizationAssets = {};

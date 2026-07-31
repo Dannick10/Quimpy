@@ -122,7 +122,7 @@ function getOptionGameMode() {
       text: "NORMAL",
       action: () => {
         gameState = "playing";
-        settings.dificulty = "NORMAL";
+        settings.mode = "NORMAL";
         startGame();
       },
       template: buttonsTemplate.primary,
@@ -131,7 +131,7 @@ function getOptionGameMode() {
       text: "CASUAL",
       action: () => {
         gameState = "playing";
-        settings.dificulty = "CASUAL";
+        settings.mode = "CASUAL";
         startGame();
       },
       template: buttonsTemplate.tertiary,

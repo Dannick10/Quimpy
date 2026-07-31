@@ -119,8 +119,8 @@ class Player extends AnimatedEntity {
 
     this.handleInput(targetSpeed);
 
-    if (this.x < 0) this.x = width - this.width;
-    if (this.x + this.width > width) this.x = 0;
+    if (this.x + this.width / 2 < 0) this.x = width - this.width;
+    if (this.x + this.width / 2 > width) this.x = 0;
 
     this.move();
 
