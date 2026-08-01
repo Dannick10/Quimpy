@@ -11,10 +11,11 @@ class Card extends Entity {
       { name: "Impulso do Coelho", hability: "jump_boost", price: 3 },
       { name: "Passo Fantasma", hability: "ghost", price: 4 },
       { name: "Tempo Lento", hability: "slow_time", price: 6 },
-      { name: "Escudo de Papelão", hability: "shield", price: 3 },
+      { name: "Escudo de Papelão", hability: "shield", price: 7 },
       { name: "Pés de Vento", hability: "dash", price: 4 },
       { name: "Campo Magnético", hability: "magnet", price: 5 },
       { name: "Moeda da Fortuna", hability: "coin_2x", price: 6 },
+      { name: "Guarda Chuva", hability: "delta_force", price: 3 },
     ];
 
     const card = random(cardTypes);

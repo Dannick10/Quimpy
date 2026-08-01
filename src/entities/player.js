@@ -136,6 +136,12 @@ class Player extends AnimatedEntity {
       this.canJump = false;
     }
 
+    if (this.powerSystem.isDeltaForceActive() && player.dy > 0) {
+      this.gravity = this.powerSystem.effects.deltaForce;
+    } else {
+      this.gravity = 0.9; 
+    }
+
     this.updateAnimation();
     this.powerSystem.update();
   }
@@ -203,7 +209,7 @@ class Player extends AnimatedEntity {
         return;
       }
 
-      if(this.powerSystem.isPowerActive("ghost")) return
+      if (this.powerSystem.isPowerActive("ghost")) return;
 
       if (this.powerSystem.effects.shieldActive) {
         this.powerSystem.effects.shieldActive = false;

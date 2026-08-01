@@ -6,7 +6,8 @@ class PowerSystem {
       slowTimeFactor: 0.4,
       dashSpeed: 10,
       magnetRadius: 150,
-      shieldActive: false, 
+      shieldActive: false,
+      deltaForce: 0.1,
     };
     this.durations = {
       jump_boost: 30000,
@@ -15,6 +16,7 @@ class PowerSystem {
       dash: 30000,
       magnet: 30000,
       coin_2x: 30000,
+      delta_force: 30000,
     };
   }
 
@@ -48,9 +50,13 @@ class PowerSystem {
   isMagnetActive() {
     return this.isPowerActive("magnet");
   }
-  
+
   isCoin2xActive() {
     return this.isPowerActive("coin_2x");
+  }
+
+  isDeltaForceActive() {
+    return this.isPowerActive("delta_force");
   }
 
   shouldDieOnCollision() {
@@ -71,7 +77,7 @@ class PowerSystem {
   getDashSpeed() {
     return this.effects.dashSpeed;
   }
-  
+
   update() {
     const now = millis();
     for (let [power, expireTime] of this.activePowers.entries()) {
@@ -95,6 +101,7 @@ class PowerSystem {
     if (this.isMagnetActive()) this.drawMagnet(px, py);
     if (this.isCoin2xActive()) this.drawCoin2x(px, py, player.height);
     if (this.isSlowTimeActive()) this.drawSlowTime(px, py);
+    if (this.isDeltaForceActive()) this.drawDeltaForce(px, py);
   }
 
   drawJumpBoost(px, py, playerWidth) {
@@ -211,6 +218,89 @@ class PowerSystem {
     line(px, sy, px + 8, sy);
     noStroke();
   }
+
+ drawDeltaForce(px, py) {
+  let y = py - 38;
+  let pulse = sin(frameCount * 0.15) * 2;
+  let w = 54 + pulse;
+  let h = 34 + pulse;
+
+  push(); 
+
+
+  noStroke();
+  fill(140, 210, 255, 40);
+  ellipse(px, y + 8, 75 + pulse * 2, 48 + pulse);
+  fill(180, 235, 255, 20);
+  ellipse(px, y + 8, 95 + pulse * 2, 60 + pulse);
+
+  stroke(255);
+  strokeWeight(2);
+  fill(210, 245, 255);
+  triangle(px - 3, y - h / 2 + 2, px + 3, y - h / 2 + 2, px, y - h / 2 - 6);
+
+  stroke(255);
+  strokeWeight(2);
+  fill(60, 150, 230, 230);
+  arc(px, y, w, h, PI, TWO_PI, CHORD);
+  fill(100, 185, 255, 230);
+  arc(px, y, w * 0.65, h, PI, TWO_PI, CHORD);
+
+
+  fill(170, 225, 255, 240);
+  arc(px, y, w * 0.32, h, PI, TWO_PI, CHORD);
+
+  strokeWeight(1.5);
+  for (let i = -2; i <= 2; i++) {
+    if (i === 0) fill(170, 225, 255, 240);
+    else if (Math.abs(i) === 1) fill(100, 185, 255, 230);
+    else fill(60, 150, 230, 230);
+
+    arc(px + i * 10, y, 10.5, 8, 0, PI, CHORD);
+  }
+
+  noFill();
+  stroke(255, 255, 255, 160);
+  strokeWeight(1.5);
+  arc(px - 9, y, 18, h, PI + HALF_PI * 0.3, TWO_PI);
+  arc(px + 9, y, 18, h, PI, TWO_PI - HALF_PI * 0.3);
+
+  stroke(220, 240, 255);
+  strokeWeight(3);
+  line(px, y, px, y + 28);
+
+  noFill();
+  arc(px + 5, y + 28, 10, 10, 0, HALF_PI);
+  
+  fill(255);
+  noStroke();
+  ellipse(px + 10, y + 28, 3, 3);
+
+  for (let i = 0; i < 6; i++) {
+    let angle = frameCount * 0.06 + i * (TWO_PI / 6);
+    let x = px + cos(angle) * 30;
+    let yy = y - 8 + sin(angle * 2) * 7;
+
+    fill(180, 245, 255, 210);
+    ellipse(x, yy, 4, 7);
+  }
+
+  fill(255, 255, 255, 210);
+  ellipse(px - 12, y - h / 4, 7, 7);
+  ellipse(px + 10, y - h / 3, 4, 4);
+
+
+  for (let i = 0; i < 5; i++) {
+    let dx = sin(frameCount * 0.04 + i * 2) * 24;
+    let dy = (frameCount * 1.3 + i * 12) % 38;
+    let alpha = map(dy, 0, 38, 220, 0);
+
+    fill(200, 240, 255, alpha);
+    ellipse(px + dx, y + dy, 3, 6);
+  }
+
+  pop(); 
+}
 }
 
 function drawHudPower() {
@@ -328,6 +418,22 @@ function drawPowerIcon(hability) {
       textSize(13);
       textStyle(BOLD);
       text("2X", 0, 25);
+      break;
+    case "delta_force":
+      iconCircle("#ff4d4d");
+      stroke("#fff");
+      strokeWeight(3);
+      noFill();
+      arc(0, -2, 34, 22, PI, TWO_PI);
+      line(-17, -2, -12, 2);
+      line(-12, 2, -6, -2);
+      line(-6, -2, 0, 2);
+      line(0, 2, 6, -2);
+      line(6, -2, 12, 2);
+      line(12, 2, 17, -2);
+      line(0, -2, 0, 15);
+      arc(4, 18, 8, 8, 0, HALF_PI);
+      noStroke();
       break;
   }
 }
