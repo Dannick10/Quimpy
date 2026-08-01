@@ -420,7 +420,7 @@ function drawPowerIcon(hability) {
       text("2X", 0, 25);
       break;
     case "delta_force":
-      iconCircle("#ff4d4d");
+      iconCircle("#00bbf9");
       stroke("#fff");
       strokeWeight(3);
       noFill();

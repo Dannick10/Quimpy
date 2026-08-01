@@ -1,24 +1,19 @@
 class Card extends Entity {
-  constructor(x, y, size) {
+  constructor(x, y, size, cardData) {
     super(x, y);
     this.sizeX = size;
     this.sizeY = size * 1.2;
-    this.getRandomCard();
+    const card = cardData || random(CARD_TYPES);
+
+    this.name = card.name;
+    this.hability = card.hability;
+
+    let multiplier = Math.floor(score / 1000);
+    this.price = card.price + multiplier;
   }
 
   getRandomCard() {
-    const cardTypes = [
-      { name: "Impulso do Coelho", hability: "jump_boost", price: 3 },
-      { name: "Passo Fantasma", hability: "ghost", price: 4 },
-      { name: "Tempo Lento", hability: "slow_time", price: 6 },
-      { name: "Escudo de Papelão", hability: "shield", price: 7 },
-      { name: "Pés de Vento", hability: "dash", price: 4 },
-      { name: "Campo Magnético", hability: "magnet", price: 5 },
-      { name: "Moeda da Fortuna", hability: "coin_2x", price: 6 },
-      { name: "Guarda Chuva", hability: "delta_force", price: 3 },
-    ];
-
-    const card = random(cardTypes);
+    const card = cardData || random(CARD_TYPES);
 
     this.name = card.name;
 
@@ -128,17 +123,39 @@ class Card extends Entity {
   }
 }
 
+const CARD_TYPES = [
+  { name: "Impulso do Coelho", hability: "jump_boost", price: 3 },
+  { name: "Passo Fantasma", hability: "ghost", price: 4 },
+  { name: "Tempo Lento", hability: "slow_time", price: 6 },
+  { name: "Escudo de Papelão", hability: "shield", price: 7 },
+  { name: "Pés de Vento", hability: "dash", price: 4 },
+  { name: "Campo Magnético", hability: "magnet", price: 5 },
+  { name: "Moeda da Fortuna", hability: "coin_2x", price: 6 },
+  { name: "Guarda Chuva", hability: "delta_force", price: 3 },
+];
+
 function createCards() {
-  if (settings.mode == "CASUAL") return;
+ if (settings.mode == "CASUAL") return;
+
+  let availableCards = CARD_TYPES.filter(
+    (card) => !player.powerSystem.isPowerActive(card.hability)
+  );
+
+  if (availableCards.length === 0) return;
+
   playSound(card_Sound);
   cards = [];
-  let num = 3;
+
+
+  availableCards = shuffle(availableCards);
+  let num = Math.min(3, availableCards.length);
+  
   let s = constrain(width * 0.28, 140, 220);
   let totalW = num * s + (num - 1) * 20;
   let startX = (width - totalW) / 2;
 
   for (let i = 0; i < num; i++) {
-    cards.push(new Card(startX + i * (s + 20), height * 0.25, s));
+    cards.push(new Card(startX + i * (s + 20), height * 0.25, s, availableCards[i]));
   }
 }
 
