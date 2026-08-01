@@ -154,6 +154,27 @@ let inventoryState = {
         assetKey: "player11Sprite",
         assetPath: "sprites/customization/skin/playerSprite11.png",
       },
+      {
+        id: "pl12",
+        label: "Sapo Saltitante",
+        spriteKey: "player12Sprite",
+        assetKey: "player12Sprite",
+        assetPath: "sprites/customization/skin/playerSprite12.png",
+      },
+      {
+        id: "pl13",
+        label: "Abelha Trabalhadora",
+        spriteKey: "player13Sprite",
+        assetKey: "player13Sprite",
+        assetPath: "sprites/customization/skin/playerSprite13.png",
+      },
+      {
+        id: "pl14",
+        label: "Gato Doméstico",
+        spriteKey: "player14Sprite",
+        assetKey: "player14Sprite",
+        assetPath: "sprites/customization/skin/playerSprite14.png",
+      },
     ],
   },
 };

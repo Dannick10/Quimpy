@@ -111,7 +111,7 @@ function getGameOverButtons() {
       template: buttonsTemplate.back,
     },
   ], {
- centerY: 480,
+ centerY: 500,
  gap: 80
   });
 }
