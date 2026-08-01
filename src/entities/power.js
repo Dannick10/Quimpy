@@ -90,12 +90,12 @@ class PowerSystem {
   draw(player) {
     let px = player.x + player.width / 2;
     let py = player.y + player.height / 2;
-
     if (this.isPowerActive("jump_boost"))
-      this.drawJumpBoost(px, py, player.width);
+      this.drawJumpBoost(px, py, player.width, player.height);
     if (this.isGhostActive())
       this.drawGhost(px, py, player.width, player.height);
-    if (this.effects.shieldActive) this.drawShield(px, py, player.width);
+    if (this.effects.shieldActive)
+      this.drawShield(px, py, player.width, player.height);
     if (this.isDashing())
       this.drawDash(px, py, player.x, player.width, player.height);
     if (this.isMagnetActive()) this.drawMagnet(px, py);
@@ -104,71 +104,166 @@ class PowerSystem {
     if (this.isDeltaForceActive()) this.drawDeltaForce(px, py);
   }
 
-  drawJumpBoost(px, py, playerWidth) {
-    noStroke();
-    let pulse = sin(frameCount * 0.15) * 8;
-    fill(255, 220, 80, 60);
-    ellipse(px, py + 20, playerWidth * 1.8 + pulse, 25);
+  drawJumpBoost(px, py, playerWidth, playerHeight) {
+    push();
+    let feetY = py + playerHeight / 2 + 2;
 
-    for (let i = 0; i < 3; i++) {
-      let angle = frameCount * 0.05 + i * 2;
-      let x = px + cos(angle) * 35;
-      let y = py - abs(sin(angle)) * 35;
-      fill(255, 240, 120);
-      star(x, y, 7, 3, 5);
+    noFill();
+    stroke(255, 220, 80, 220);
+    strokeWeight(2.5);
+    beginShape();
+    for (let i = 0; i < 12; i++) {
+      let angle = frameCount * 0.2 + i * 0.5;
+      let sx = px + sin(angle) * (12 - i * 0.8);
+      let sy = feetY + i * 2.2;
+      vertex(sx, sy);
     }
+    endShape();
+
+    noStroke();
+    for (let i = 0; i < 4; i++) {
+      let angle = frameCount * 0.08 + i * 1.5;
+      let sx = px + cos(angle) * 28;
+      let sy = feetY - 10 - ((frameCount * 1.5 + i * 15) % 40);
+      let alpha = map(feetY - sy, 10, 50, 255, 0);
+
+      fill(255, 235, 110, alpha);
+      star(sx, sy, 6, 2.5, 5);
+    }
+    pop();
   }
 
   drawGhost(px, py, playerWidth, playerHeight) {
+    push();
     noStroke();
     for (let i = 3; i > 0; i--) {
       fill(180, 240, 255, 40 / i);
       ellipse(px - i * 8, py, playerWidth + i * 12, playerHeight + i * 12);
     }
-
     fill(200, 255, 255, 50);
-    ellipse(px, py, playerWidth * 2, playerHeight * 2);
+    ellipse(px, py, playerWidth * 1.5, playerHeight * 1.5);
 
-    for (let i = 0; i < 4; i++) {
-      let x = px + sin(frameCount * 0.08 + i) * 25;
-      let y = py + ((frameCount * 0.8 + i * 20) % 50) - 25;
-      fill(220, 255, 255, 160);
-      circle(x, y, random(3, 6));
+    for (let i = 0; i < 5; i++) {
+      let floatOffset = sin(frameCount * 0.06) * 4;
+      let pulse = sin(frameCount * 0.1) * 4;
+      let ghostY = py + floatOffset;
+      let speed = 0.9 + (i % 3) * 0.2;
+      let progress = (frameCount * speed + i * 18) % 100;
+
+      let spreadAngle = -HALF_PI + sin(i * 1.4) * 0.65;
+      let travelDist = map(progress, 0, 55, 8, 70);
+
+      let mgX =
+        px + cos(spreadAngle) * travelDist + sin(frameCount * 0.08 + i) * 6;
+      let mgY = ghostY + sin(spreadAngle) * travelDist;
+
+      let alpha = map(progress, 0, 55, 230, 0);
+      let scaleFactor = map(progress, 0, 55, 0.5, 1.1);
+
+      let gW = 20 * scaleFactor;
+      let gH = 24 * scaleFactor;
+
+      push();
+      translate(mgX, mgY);
+      rotate(sin(frameCount * 0.1 + i) * 0.25);
+      noStroke();
+      fill(100, 200, 255, alpha * 0.35);
+      ellipse(0, 0, gW * 1.7, gH * 1.6);
+      fill(225, 248, 255, alpha);
+      arc(0, -gH * 0.15, gW, gH * 0.85, PI, TWO_PI);
+      rect(-gW / 2, -gH * 0.15, gW, gH * 0.45);
+      let waveW = gW / 3;
+      for (let k = 0; k < 3; k++) {
+        let xOffset = -gW / 2 + k * waveW + waveW / 2;
+        arc(xOffset, gH * 0.3, waveW, 5 * scaleFactor, 0, PI);
+      }
+      pop();
     }
+    pop();
   }
 
-  drawShield(px, py, playerWidth) {
-    let size = playerWidth * 2.2 + sin(frameCount * 0.12) * 6;
-    noFill();
-    stroke(120, 220, 255, 120);
-    strokeWeight(3);
-    circle(px, py, size);
-
-    stroke(255, 255, 255, 100);
-    circle(px, py, size + 12);
+  drawShield(px, py, playerWidth, playerHeight) {
+    push();
+    let size = max(playerWidth, playerHeight) * 1.5 + sin(frameCount * 0.1) * 4;
 
     noStroke();
-    for (let i = 0; i < 5; i++) {
-      let angle = frameCount * 0.04 + i;
-      fill(255, 255, 255, 180);
-      circle(px + (cos(angle) * size) / 2, py + (sin(angle) * size) / 2, 4);
+    fill(60, 220, 200, 30);
+    ellipse(px, py, size * 1.25);
+    fill(100, 255, 230, 20);
+    ellipse(px, py, size * 1.45);
+
+    fill(40, 180, 220, 50);
+    stroke(120, 245, 255, 220);
+    strokeWeight(2.5);
+    ellipse(px, py, size);
+
+    noFill();
+    stroke(255, 255, 255, 180);
+    strokeWeight(1.5);
+    push();
+    translate(px, py);
+    rotate(frameCount * 0.03);
+    arc(0, 0, size + 10, size + 10, 0, HALF_PI);
+    arc(0, 0, size + 10, size + 10, PI, PI + HALF_PI);
+    pop();
+
+    stroke(255, 255, 255, 190);
+    strokeWeight(2);
+    noFill();
+    arc(px, py, size * 0.85, size * 0.85, PI + QUARTER_PI, TWO_PI - QUARTER_PI);
+
+    noStroke();
+    for (let i = 0; i < 6; i++) {
+      let angle = frameCount * 0.05 + i * (TWO_PI / 6);
+      let sx = px + (cos(angle) * size) / 2;
+      let sy = py + (sin(angle) * size) / 2;
+      fill(200, 255, 255, 220);
+      ellipse(sx, sy, 5, 5);
     }
+    pop();
   }
 
   drawDash(px, py, playerX, playerWidth, playerHeight) {
+    push();
+    noStroke();
+    if (player.dx > 0 || player.dx < 0) {
+      for (let i = 1; i <= 5; i++) {
+        let alpha = 140 - i * 25;
+        fill(255, 210, 80, alpha);
+        ellipse(
+          playerX - i * 14,
+          py,
+          playerWidth * (1 - i * 0.12),
+          playerHeight * 0.8,
+        );
+      }
+    }
+    stroke(255, 230, 120, 200);
+    strokeWeight(2);
+    noFill();
+    let feetY = py + playerHeight / 2 - 4;
+    for (let i = 0; i < 3; i++) {
+      let waveW = 35 + sin(frameCount * 0.2 + i) * 12;
+      let waveY = feetY - i * 8;
+      arc(px - 5, waveY, waveW, 10, PI * 0.2, PI * 1.8);
+    }
+
+    stroke(255, 255, 255, 220);
+    strokeWeight(1.5);
+    for (let i = 0; i < 4; i++) {
+      let lx = px + random(-25, 25);
+      let ly = py + random(-playerHeight / 2, playerHeight / 2);
+      line(lx, ly, lx - random(15, 30), ly);
+    }
+
     noStroke();
     for (let i = 0; i < 6; i++) {
-      fill(255, 220, 80, 120 - i * 15);
-      ellipse(playerX - i * 15, py, 35 + i * 8, 20);
+      let dx = px - ((frameCount * 6 + i * 18) % 70);
+      let dy = feetY + sin(i + frameCount * 0.1) * 6;
+      fill(255, 245, 180, map(px - dx, 0, 70, 255, 0));
+      ellipse(dx, dy, random(3, 6), random(2, 4));
     }
-
-    fill(255, 240, 150, 80);
-    ellipse(px, py, playerWidth * 2, playerHeight * 2);
-
-    for (let i = 0; i < 5; i++) {
-      fill(255);
-      circle(px + random(-30, 30), py + random(-20, 20), random(2, 5));
-    }
+    pop();
   }
 
   drawMagnet(px, py) {
@@ -219,88 +314,85 @@ class PowerSystem {
     noStroke();
   }
 
- drawDeltaForce(px, py) {
-  let y = py - 38;
-  let pulse = sin(frameCount * 0.15) * 2;
-  let w = 54 + pulse;
-  let h = 34 + pulse;
+  drawDeltaForce(px, py) {
+    let y = py - 38;
+    let pulse = sin(frameCount * 0.15) * 2;
+    let w = 54 + pulse;
+    let h = 34 + pulse;
 
-  push(); 
+    push();
 
+    noStroke();
+    fill(140, 210, 255, 40);
+    ellipse(px, y + 8, 75 + pulse * 2, 48 + pulse);
+    fill(180, 235, 255, 20);
+    ellipse(px, y + 8, 95 + pulse * 2, 60 + pulse);
 
-  noStroke();
-  fill(140, 210, 255, 40);
-  ellipse(px, y + 8, 75 + pulse * 2, 48 + pulse);
-  fill(180, 235, 255, 20);
-  ellipse(px, y + 8, 95 + pulse * 2, 60 + pulse);
+    stroke(255);
+    strokeWeight(2);
+    fill(210, 245, 255);
+    triangle(px - 3, y - h / 2 + 2, px + 3, y - h / 2 + 2, px, y - h / 2 - 6);
 
-  stroke(255);
-  strokeWeight(2);
-  fill(210, 245, 255);
-  triangle(px - 3, y - h / 2 + 2, px + 3, y - h / 2 + 2, px, y - h / 2 - 6);
+    stroke(255);
+    strokeWeight(2);
+    fill(60, 150, 230, 230);
+    arc(px, y, w, h, PI, TWO_PI, CHORD);
+    fill(100, 185, 255, 230);
+    arc(px, y, w * 0.65, h, PI, TWO_PI, CHORD);
 
-  stroke(255);
-  strokeWeight(2);
-  fill(60, 150, 230, 230);
-  arc(px, y, w, h, PI, TWO_PI, CHORD);
-  fill(100, 185, 255, 230);
-  arc(px, y, w * 0.65, h, PI, TWO_PI, CHORD);
+    fill(170, 225, 255, 240);
+    arc(px, y, w * 0.32, h, PI, TWO_PI, CHORD);
 
+    strokeWeight(1.5);
+    for (let i = -2; i <= 2; i++) {
+      if (i === 0) fill(170, 225, 255, 240);
+      else if (Math.abs(i) === 1) fill(100, 185, 255, 230);
+      else fill(60, 150, 230, 230);
 
-  fill(170, 225, 255, 240);
-  arc(px, y, w * 0.32, h, PI, TWO_PI, CHORD);
+      arc(px + i * 10, y, 10.5, 8, 0, PI, CHORD);
+    }
 
-  strokeWeight(1.5);
-  for (let i = -2; i <= 2; i++) {
-    if (i === 0) fill(170, 225, 255, 240);
-    else if (Math.abs(i) === 1) fill(100, 185, 255, 230);
-    else fill(60, 150, 230, 230);
+    noFill();
+    stroke(255, 255, 255, 160);
+    strokeWeight(1.5);
+    arc(px - 9, y, 18, h, PI + HALF_PI * 0.3, TWO_PI);
+    arc(px + 9, y, 18, h, PI, TWO_PI - HALF_PI * 0.3);
 
-    arc(px + i * 10, y, 10.5, 8, 0, PI, CHORD);
+    stroke(220, 240, 255);
+    strokeWeight(3);
+    line(px, y, px, y + 28);
+
+    noFill();
+    arc(px + 5, y + 28, 10, 10, 0, HALF_PI);
+
+    fill(255);
+    noStroke();
+    ellipse(px + 10, y + 28, 3, 3);
+
+    for (let i = 0; i < 6; i++) {
+      let angle = frameCount * 0.06 + i * (TWO_PI / 6);
+      let x = px + cos(angle) * 30;
+      let yy = y - 8 + sin(angle * 2) * 7;
+
+      fill(180, 245, 255, 210);
+      ellipse(x, yy, 4, 7);
+    }
+
+    fill(255, 255, 255, 210);
+    ellipse(px - 12, y - h / 4, 7, 7);
+    ellipse(px + 10, y - h / 3, 4, 4);
+
+    for (let i = 0; i < 5; i++) {
+      let dx = sin(frameCount * 0.04 + i * 2) * 24;
+      let dy = (frameCount * 1.3 + i * 12) % 38;
+      let alpha = map(dy, 0, 38, 220, 0);
+
+      fill(200, 240, 255, alpha);
+      ellipse(px + dx, y + dy, 3, 6);
+    }
+
+    pop();
   }
-
-  noFill();
-  stroke(255, 255, 255, 160);
-  strokeWeight(1.5);
-  arc(px - 9, y, 18, h, PI + HALF_PI * 0.3, TWO_PI);
-  arc(px + 9, y, 18, h, PI, TWO_PI - HALF_PI * 0.3);
-
-  stroke(220, 240, 255);
-  strokeWeight(3);
-  line(px, y, px, y + 28);
-
-  noFill();
-  arc(px + 5, y + 28, 10, 10, 0, HALF_PI);
-  
-  fill(255);
-  noStroke();
-  ellipse(px + 10, y + 28, 3, 3);
-
-  for (let i = 0; i < 6; i++) {
-    let angle = frameCount * 0.06 + i * (TWO_PI / 6);
-    let x = px + cos(angle) * 30;
-    let yy = y - 8 + sin(angle * 2) * 7;
-
-    fill(180, 245, 255, 210);
-    ellipse(x, yy, 4, 7);
-  }
-
-  fill(255, 255, 255, 210);
-  ellipse(px - 12, y - h / 4, 7, 7);
-  ellipse(px + 10, y - h / 3, 4, 4);
-
-
-  for (let i = 0; i < 5; i++) {
-    let dx = sin(frameCount * 0.04 + i * 2) * 24;
-    let dy = (frameCount * 1.3 + i * 12) % 38;
-    let alpha = map(dy, 0, 38, 220, 0);
-
-    fill(200, 240, 255, alpha);
-    ellipse(px + dx, y + dy, 3, 6);
-  }
-
-  pop(); 
-}
 }
 
 function drawHudPower() {

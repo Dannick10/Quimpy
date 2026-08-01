@@ -240,6 +240,11 @@ function createEnemies(type, blockX) {
     let y = player.y - max(300, abs(player.dy) * 20);
 
     if (random(1) > 0.5) {
+      let safeDistance = 80;
+      let extraRange = random(20, 120);
+
+      let side = random() < 0.5 ? -1 : 1;
+      let x = player.x + (safeDistance + extraRange) * side;
       enemies.push(new FlyingEnemy(x, y));
     } else {
       enemies.push(new BigBallEnemy(x, y));

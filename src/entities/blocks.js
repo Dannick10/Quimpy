@@ -335,7 +335,7 @@ function createNewBlock() {
   if (random() < 0.7) {
     distance = random(70, 110);
   } else {
-    distance = random(120, 170);
+    distance = random(110, 160);
   }
 
   let direction = random() < 0.5 ? -1 : 1;
