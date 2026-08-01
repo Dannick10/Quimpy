@@ -15,7 +15,7 @@ function startGame() {
   lastBlockX = width / 2;
   nextCardScore = 1000;
   multiplier = 1;
-  respawnEnemiesRate = 20
+  respawnEnemiesRate = 40;
 
   powerSystem = new PowerSystem();
 

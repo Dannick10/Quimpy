@@ -26,126 +26,137 @@ function getMenuButtons() {
     ],
     {
       gap: 100,
-    }
+    },
   );
 }
 
 function getSettingsButtons() {
-  return createButtonLayout([
-    {
-      text: "SOM: " + (settings.sound ? "ON" : "OFF"),
-      action: () => {
-        settings.sound = !settings.sound;
-        outputVolume(settings.sound ? 0.1 : 0);
-      },
-      template: settings.sound
-        ? buttonsTemplate.primary
-        : buttonsTemplate.secondary,
-    },
-    {
-      text:
-        "CONTROLE: " +
-        (settings.mobileControl === "swipe" ? "DESLIZAR" : "BOTÕES"),
-      action: () => {
-        settings.mobileControl =
-          settings.mobileControl === "swipe" ? "buttons" : "swipe";
-      },
-      template:
-        settings.mobileControl === "swipe"
+  return createButtonLayout(
+    [
+      {
+        text: "SOM: " + (settings.sound ? "ON" : "OFF"),
+        action: () => {
+          settings.sound = !settings.sound;
+          outputVolume(settings.sound ? 0.1 : 0);
+        },
+        template: settings.sound
           ? buttonsTemplate.primary
           : buttonsTemplate.secondary,
-    },
-    {
-      text: "PULO AUTOMÁTICO: " + (settings.autoJump ? "ON" : "OFF"),
-      action: () => {
-        settings.autoJump = !settings.autoJump;
       },
-      template: settings.autoJump
-        ? buttonsTemplate.primary
-        : buttonsTemplate.secondary,
-    },
-    {
-      text: "VOLTAR",
-      action: () => {
-        gameState = "menu";
+      {
+        text:
+          "CONTROLE: " +
+          (settings.mobileControl === "swipe" ? "DESLIZAR" : "BOTÕES"),
+        action: () => {
+          settings.mobileControl =
+            settings.mobileControl === "swipe" ? "buttons" : "swipe";
+        },
+        template:
+          settings.mobileControl === "swipe"
+            ? buttonsTemplate.primary
+            : buttonsTemplate.secondary,
       },
-      template: buttonsTemplate.back,
+      {
+        text: "PULO AUTOMÁTICO: " + (settings.autoJump ? "ON" : "OFF"),
+        action: () => {
+          settings.autoJump = !settings.autoJump;
+        },
+        template: settings.autoJump
+          ? buttonsTemplate.primary
+          : buttonsTemplate.secondary,
+      },
+      {
+        text: "VOLTAR",
+        action: () => {
+          gameState = "menu";
+        },
+        template: buttonsTemplate.back,
+      },
+    ],
+    {
+      gap: 100,
     },
-  ],{
-    gap:100,
-  })
+  );
 }
 
 function getInventoryButtons() {
-  return createButtonLayout([
-    {
-      text: "VOLTAR",
-      action: () => {
-        gameState = "menu";
-        inventoryState.categoryIndex = 0;
-        inventoryState.page = 0;
+  return createButtonLayout(
+    [
+      {
+        text: "VOLTAR",
+        action: () => {
+          gameState = "menu";
+          inventoryState.categoryIndex = 0;
+          inventoryState.page = 0;
+        },
+        template: buttonsTemplate.back,
       },
-      template: buttonsTemplate.back,
+    ],
+    {
+      centerY: 550,
     },
-  ],
-{
- centerY: 550
-})
+  );
 }
 
 function getGameOverButtons() {
-  return createButtonLayout([
-    {
-      text: "REINICIAR",
-      action: () => {
-        gameState = "playing";
-        startGame();
+  return createButtonLayout(
+    [
+      {
+        text: "REINICIAR",
+        action: () => {
+          gameState = "playing";
+          startGame();
+        },
+        template: buttonsTemplate.primary,
       },
-      template: buttonsTemplate.primary,
-    },
-    {
-      text: "VOLTAR AO MENU",
-      action: () => {
-        gameState = "menu";
+      {
+        text: "VOLTAR AO MENU",
+        action: () => {
+          gameState = "menu";
+        },
+        template: buttonsTemplate.back,
       },
-      template: buttonsTemplate.back,
+    ],
+    {
+      centerY: height / 2 + 180,
+      gap: 80,
     },
-  ], {
- centerY: 500,
- gap: 80
-  });
+  );
 }
 
 function getOptionGameMode() {
-  return createButtonLayout([
-    {
-      text: "NORMAL",
-      action: () => {
-        gameState = "playing";
-        settings.mode = "NORMAL";
-        startGame();
+  return createButtonLayout(
+    [
+      {
+        text: "NORMAL",
+        action: () => {
+          gameState = "playing";
+          settings.mode = "NORMAL";
+          startGame();
+        },
+        template: buttonsTemplate.primary,
       },
-      template: buttonsTemplate.primary,
-    },
-    {
-      text: "CASUAL",
-      action: () => {
-        gameState = "playing";
-        settings.mode = "CASUAL";
-        startGame();
+      {
+        text: "CASUAL",
+        action: () => {
+          gameState = "playing";
+          settings.mode = "CASUAL";
+          startGame();
+        },
+        template: buttonsTemplate.tertiary,
       },
-      template: buttonsTemplate.tertiary,
-    },
-    {
-      text: "VOLTAR",
-      action: () => {
-        gameState = "menu";
+      {
+        text: "VOLTAR",
+        action: () => {
+          gameState = "menu";
+        },
+        template: buttonsTemplate.back,
       },
-      template: buttonsTemplate.back,
+    ],
+    {
+      gap: 100,
     },
-  ], {
-    gap: 100
-  });
+  );
 }
 
 function getInventoryScale() {

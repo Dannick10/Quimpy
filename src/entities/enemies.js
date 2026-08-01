@@ -253,16 +253,12 @@ function createEnemies(type, blockX) {
     enemyCounter = 0;
   }
 
-  if (score > 10000) {
-    respawnEnemiesRate -= 10;
-  }
-
-  if (score > 20000) {
-    respawnEnemiesRate -= 10;
-  }
-
   if (score > 30000) {
-    respawnEnemiesRate -= 10;
+    respawnEnemiesRate = 15;
+  } else if (score > 20000) {
+    respawnEnemiesRate = 25;
+  } else if (score > 10000) {
+    respawnEnemiesRate = 35;
   }
 }
 
