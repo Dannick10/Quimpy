@@ -42,9 +42,22 @@ class Card extends Entity {
     rect(this.x, this.y, this.sizeX, this.sizeY, r);
 
     stroke(90, 50, 15);
-    strokeWeight(5);
+    strokeWeight(this.isSelected ? 7 : 5);
     noFill();
     rect(this.x, this.y, this.sizeX, this.sizeY, r);
+
+    if (this.isSelected) {
+      stroke(255, 210, 90);
+      strokeWeight(4);
+      noFill();
+      rect(
+        this.x - 8,
+        this.y - 8,
+        this.sizeX + 16,
+        this.sizeY + 16,
+        r + 6,
+      );
+    }
 
     noStroke();
     fill(255, 235, 170);
@@ -134,6 +147,111 @@ const CARD_TYPES = [
   { name: "Guarda Chuva", hability: "delta_force", price: 3 },
 ];
 
+let cardMenuState = {
+  selectedIndex: 0,
+  focus: "card",
+  leftHeld: false,
+  rightHeld: false,
+  upHeld: false,
+  downHeld: false,
+  confirmHeld: false,
+};
+
+function resetCardMenuState() {
+  cardMenuState = {
+    selectedIndex: 0,
+    focus: "card",
+    leftHeld: false,
+    rightHeld: false,
+    upHeld: false,
+    downHeld: false,
+    confirmHeld: false,
+  };
+}
+
+function updateCardMenuSelection() {
+  if (cards.length === 0) {
+    resetCardMenuState();
+    return;
+  }
+
+  const pad = getGamepadState();
+  const moveLeft = pad.left || keyIsDown(65) || keyIsDown(37);
+  const moveRight = pad.right || keyIsDown(68) || keyIsDown(39);
+  const moveUp = pad.up || keyIsDown(87) || keyIsDown(38);
+  const moveDown = pad.down || keyIsDown(83) || keyIsDown(40);
+  const confirmPress = pad.jump || keyIsDown(13) || keyIsDown(90) || keyIsDown(65);
+
+  if (moveLeft && !cardMenuState.leftHeld) {
+    if (cardMenuState.focus === "close") {
+      cardMenuState.focus = "card";
+    } else {
+      cardMenuState.selectedIndex =
+        (cardMenuState.selectedIndex - 1 + cards.length) % cards.length;
+    }
+    cardMenuState.leftHeld = true;
+  } else if (!moveLeft) {
+    cardMenuState.leftHeld = false;
+  }
+
+  if (moveRight && !cardMenuState.rightHeld) {
+    if (cardMenuState.focus === "close") {
+      cardMenuState.focus = "card";
+    } else {
+      cardMenuState.selectedIndex =
+        (cardMenuState.selectedIndex + 1) % cards.length;
+    }
+    cardMenuState.rightHeld = true;
+  } else if (!moveRight) {
+    cardMenuState.rightHeld = false;
+  }
+
+  if (moveUp && !cardMenuState.upHeld) {
+    cardMenuState.focus = "close";
+    cardMenuState.upHeld = true;
+  } else if (!moveUp) {
+    cardMenuState.upHeld = false;
+  }
+
+  if (moveDown && !cardMenuState.downHeld) {
+    if (cardMenuState.focus === "close") {
+      cardMenuState.focus = "card";
+    }
+    cardMenuState.downHeld = true;
+  } else if (!moveDown) {
+    cardMenuState.downHeld = false;
+  }
+
+  if (confirmPress && !cardMenuState.confirmHeld) {
+    if (cardMenuState.focus === "close") {
+      cards = [];
+      resetCardMenuState();
+      return;
+    }
+
+    const chosenCard = cards[cardMenuState.selectedIndex];
+
+    if (!chosenCard) {
+      resetCardMenuState();
+      return;
+    }
+
+    if (money >= chosenCard.price) {
+      buyCard(chosenCard);
+      resetCardMenuState();
+    } else {
+      cardMessage = "você não tem peixes suficientes!";
+      cardMessageTimer = 120;
+    }
+
+    cardMenuState.confirmHeld = true;
+  }
+
+  if (!confirmPress) {
+    cardMenuState.confirmHeld = false;
+  }
+}
+
 function createCards() {
  if (settings.mode == "CASUAL") return;
 
@@ -160,17 +278,24 @@ function createCards() {
 }
 
 function updateCards() {
-  for (let card of cards) {
+  updateCardMenuSelection();
+
+  for (let i = 0; i < cards.length; i++) {
+    const card = cards[i];
+    card.isSelected =
+      cardMenuState.focus === "card" && i === cardMenuState.selectedIndex;
     card.show();
   }
 
   if (cards.length > 0) {
-    fill(252, 194, 74);
+    const closeSelected = cardMenuState.focus === "close";
+
+    fill(closeSelected ? 255 : 252, closeSelected ? 220 : 194, 74);
     rect(width - 72, 20, 54, 54, 14);
-    fill(255, 225, 120);
+    fill(closeSelected ? 255 : 255, closeSelected ? 240 : 225, 120);
     rect(width - 68, 24, 46, 18, 10);
     stroke(85, 48, 20);
-    strokeWeight(4);
+    strokeWeight(closeSelected ? 6 : 4);
     noFill();
     rect(width - 72, 20, 54, 54, 14);
     noStroke();

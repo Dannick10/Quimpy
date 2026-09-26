@@ -31,6 +31,18 @@ function updateBackgroundMusic() {
 }
 
 function setup() {
+  if (window.addEventListener) {
+    window.addEventListener("gamepadconnected", () => {
+      settings.control = "gamepad";
+    });
+
+    window.addEventListener("gamepaddisconnected", () => {
+      if (settings.control === "gamepad") {
+        settings.control = "keyboard";
+      }
+    });
+  }
+
   let sizeScreen = constrain(windowWidth, 200, 615);
   let canvas = createCanvas(sizeScreen, windowHeight);
 
@@ -120,6 +132,7 @@ function setup() {
 
 function draw() {
   updateBackgroundMusic();
+  updateMenuNavigation();
 
   if (gameState === "menu") {
     drawMenu();

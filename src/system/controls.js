@@ -31,6 +31,8 @@ function getMenuButtons() {
 }
 
 function getSettingsButtons() {
+  const gamepad = getGamepadState();
+
   return createButtonLayout(
     [
       {
@@ -44,15 +46,29 @@ function getSettingsButtons() {
           : buttonsTemplate.secondary,
       },
       {
-        text:
-          "CONTROLE: " +
-          (settings.mobileControl === "swipe" ? "DESLIZAR" : "BOTÕES"),
+        text: "CONTROLE: " + (gamepad.connected ? "CONECTADO" : "DESCONECTADO"),
         action: () => {
-          settings.mobileControl =
-            settings.mobileControl === "swipe" ? "buttons" : "swipe";
+          const canUseGamepad = getGamepadState().connected;
+          settings.control = canUseGamepad
+            ? settings.control === "gamepad"
+              ? "keyboard"
+              : "gamepad"
+            : "keyboard";
+        },
+        template: gamepad.connected
+          ? buttonsTemplate.primary
+          : buttonsTemplate.secondary,
+      },
+      {
+        text:
+          "MOVIMENTO: " +
+          (settings.movementMode === "analog" ? "ANALÓGICO" : "SETAS"),
+        action: () => {
+          settings.movementMode =
+            settings.movementMode === "analog" ? "arrows" : "analog";
         },
         template:
-          settings.mobileControl === "swipe"
+          settings.movementMode === "analog"
             ? buttonsTemplate.primary
             : buttonsTemplate.secondary,
       },
@@ -74,7 +90,7 @@ function getSettingsButtons() {
       },
     ],
     {
-      gap: 100,
+      gap: 90,
     },
   );
 }
@@ -157,6 +173,307 @@ function getOptionGameMode() {
       gap: 100,
     },
   );
+}
+
+let menuNavigation = {
+  index: 0,
+  confirmHeld: false,
+  upHeld: false,
+  downHeld: false,
+};
+
+let inventoryNavigation = {
+  focus: "items",
+  selectedIndex: 0,
+  leftHeld: false,
+  rightHeld: false,
+  upHeld: false,
+  downHeld: false,
+  confirmHeld: false,
+};
+
+function resetInventoryNavigation() {
+  inventoryNavigation = {
+    focus: "items",
+    selectedIndex: 0,
+    leftHeld: false,
+    rightHeld: false,
+    upHeld: false,
+    downHeld: false,
+    confirmHeld: false,
+  };
+}
+
+function getMenuButtonsForCurrentState() {
+  if (gameState === "menu") return getMenuButtons();
+  if (gameState === "settings") return getSettingsButtons();
+  if (gameState === "inventory") return getInventoryButtons();
+  if (gameState === "mode") return getOptionGameMode();
+  if (player && player.hasGameOver) return getGameOverButtons();
+  return [];
+}
+
+function updateInventoryNavigation() {
+  if (gameState !== "inventory") return;
+
+  const pad = getGamepadState();
+  const moveLeft = pad.left || keyIsDown(65) || keyIsDown(37);
+  const moveRight = pad.right || keyIsDown(68) || keyIsDown(39);
+  const moveUp = pad.up || keyIsDown(87) || keyIsDown(38);
+  const moveDown = pad.down || keyIsDown(83) || keyIsDown(40);
+  const confirm = pad.jump || keyIsDown(13) || keyIsDown(90) || keyIsDown(65);
+
+  let items = getInventoryPageItems();
+
+  if (inventoryNavigation.selectedIndex >= items.length) {
+    inventoryNavigation.selectedIndex = 0;
+  }
+
+  if (moveLeft && !inventoryNavigation.leftHeld) {
+    if (inventoryState.categories.length > 1) {
+      inventoryState.categoryIndex =
+        (inventoryState.categoryIndex - 1 + inventoryState.categories.length) %
+        inventoryState.categories.length;
+      inventoryState.page = 0;
+      inventoryNavigation.selectedIndex = 0;
+      inventoryNavigation.focus = "items";
+    }
+    inventoryNavigation.leftHeld = true;
+  } else if (!moveLeft) {
+    inventoryNavigation.leftHeld = false;
+  }
+
+  if (moveRight && !inventoryNavigation.rightHeld) {
+    if (inventoryState.categories.length > 1) {
+      inventoryState.categoryIndex =
+        (inventoryState.categoryIndex + 1) % inventoryState.categories.length;
+      inventoryState.page = 0;
+      inventoryNavigation.selectedIndex = 0;
+      inventoryNavigation.focus = "items";
+    }
+    inventoryNavigation.rightHeld = true;
+  } else if (!moveRight) {
+    inventoryNavigation.rightHeld = false;
+  }
+
+  items = getInventoryPageItems();
+
+  if (moveUp && !inventoryNavigation.upHeld) {
+    if (inventoryNavigation.focus === "back") {
+      inventoryNavigation.focus = "items";
+      inventoryNavigation.selectedIndex = 0;
+      menuNavigation.index = 0;
+    } else {
+      inventoryNavigation.focus = "back";
+      menuNavigation.index = 0;
+    }
+    inventoryNavigation.upHeld = true;
+  } else if (!moveUp) {
+    inventoryNavigation.upHeld = false;
+  }
+
+  if (moveDown && !inventoryNavigation.downHeld) {
+    if (inventoryNavigation.focus === "back") {
+      inventoryNavigation.focus = "items";
+      inventoryNavigation.selectedIndex = 0;
+      menuNavigation.index = 0;
+    } else {
+      const maxPage = max(
+        0,
+        ceil(inventoryState.items[getInventoryCategory()].length / inventoryState.perPage) - 1,
+      );
+
+      if (inventoryNavigation.selectedIndex >= items.length - 1) {
+        if (inventoryState.page < maxPage) {
+          inventoryState.page = min(maxPage, inventoryState.page + 1);
+          inventoryNavigation.selectedIndex = 0;
+        }
+      } else {
+        inventoryNavigation.selectedIndex = min(
+          items.length - 1,
+          inventoryNavigation.selectedIndex + 1,
+        );
+      }
+    }
+    inventoryNavigation.downHeld = true;
+  } else if (!moveDown) {
+    inventoryNavigation.downHeld = false;
+  }
+
+  items = getInventoryPageItems();
+  const categoryKey = getInventoryCategory().toLowerCase();
+  const currentItem = items[inventoryNavigation.selectedIndex];
+
+  if (currentItem && inventoryNavigation.focus === "items") {
+    inventoryState.selected[categoryKey] = currentItem.id;
+    if (player) {
+      player.setCustomization(categoryKey, currentItem.id);
+    }
+  }
+
+  if (confirm && !inventoryNavigation.confirmHeld) {
+    if (inventoryNavigation.focus === "back") {
+      const backButton = getInventoryButtons()[0];
+      if (backButton) {
+        backButton.action();
+        playSound(click_Sound);
+      }
+      resetInventoryNavigation();
+    } else if (currentItem) {
+      inventoryState.selected[categoryKey] = currentItem.id;
+      if (player) {
+        player.setCustomization(categoryKey, currentItem.id);
+      }
+      playSound(click_Sound);
+      inventoryNavigation.focus = "back";
+      menuNavigation.index = 0;
+    }
+    inventoryNavigation.confirmHeld = true;
+  }
+
+  if (!confirm) {
+    inventoryNavigation.confirmHeld = false;
+  }
+}
+
+function updateMenuNavigation() {
+  if (gameState === "inventory") {
+    updateInventoryNavigation();
+    return;
+  }
+
+  const buttons = getMenuButtonsForCurrentState();
+
+  if (!buttons.length) {
+    menuNavigation.index = 0;
+    menuNavigation.confirmHeld = false;
+    menuNavigation.upHeld = false;
+    menuNavigation.downHeld = false;
+    return;
+  }
+
+  if (menuNavigation.index >= buttons.length) {
+    menuNavigation.index = 0;
+  }
+
+  const pad = getGamepadState();
+
+  if (!pad.connected) return;
+
+  const axisY = pad.axisY || 0;
+  const moveUp = pad.up || axisY < -0.5;
+  const moveDown = pad.down || axisY > 0.5;
+
+  if (moveUp && !menuNavigation.upHeld) {
+    menuNavigation.index = (menuNavigation.index - 1 + buttons.length) % buttons.length;
+    menuNavigation.upHeld = true;
+  } else if (moveDown && !menuNavigation.downHeld) {
+    menuNavigation.index = (menuNavigation.index + 1) % buttons.length;
+    menuNavigation.downHeld = true;
+  }
+
+  if (!moveUp) menuNavigation.upHeld = false;
+  if (!moveDown) menuNavigation.downHeld = false;
+
+  const confirmPress = pad.jump || keyIsDown(13) || keyIsDown(90);
+
+  if (confirmPress && !menuNavigation.confirmHeld) {
+    const button = buttons[menuNavigation.index];
+    if (button) {
+      button.action();
+      playSound(click_Sound);
+    }
+    menuNavigation.confirmHeld = true;
+  }
+
+  if (!confirmPress) {
+    menuNavigation.confirmHeld = false;
+  }
+}
+
+function getGamepadState() {
+  const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+  const pad = pads && pads[0] ? pads[0] : null;
+
+  if (!pad) {
+    return {
+      connected: false,
+      left: false,
+      right: false,
+      up: false,
+      down: false,
+      jump: false,
+      axisX: 0,
+      axisY: 0,
+    };
+  }
+
+  const axisX = pad.axes && pad.axes[0] !== undefined ? pad.axes[0] : 0;
+  const axisY = pad.axes && pad.axes[1] !== undefined ? pad.axes[1] : 0;
+
+  const left =
+    !!pad.buttons?.[14]?.pressed ||
+    !!pad.buttons?.[6]?.pressed ||
+    axisX < -0.35;
+
+  const right =
+    !!pad.buttons?.[15]?.pressed ||
+    !!pad.buttons?.[7]?.pressed ||
+    axisX > 0.35;
+
+  const up =
+    !!pad.buttons?.[12]?.pressed ||
+    !!pad.buttons?.[4]?.pressed ||
+    axisY < -0.35;
+
+  const down =
+    !!pad.buttons?.[13]?.pressed ||
+    !!pad.buttons?.[5]?.pressed ||
+    axisY > 0.35;
+
+  const jump =
+    !!pad.buttons?.[0]?.pressed ||
+    !!pad.buttons?.[1]?.pressed ||
+    !!pad.buttons?.[2]?.pressed ||
+    !!pad.buttons?.[3]?.pressed ||
+    !!pad.buttons?.[8]?.pressed ||
+    !!pad.buttons?.[9]?.pressed;
+
+  return {
+    connected: true,
+    left,
+    right,
+    up,
+    down,
+    jump,
+    axisX,
+    axisY,
+  };
+}
+
+function getMovementInput() {
+  const pad = getGamepadState();
+  const keyboardLeft = keyIsDown(65) || keyIsDown(37);
+  const keyboardRight = keyIsDown(68) || keyIsDown(39);
+
+  if (pad.connected) {
+    return {
+      left: keyboardLeft || actionMobile.left || pad.left,
+      right: keyboardRight || actionMobile.right || pad.right,
+    };
+  }
+
+  return {
+    left: keyboardLeft || actionMobile.left,
+    right: keyboardRight || actionMobile.right,
+  };
+}
+
+function getJumpInput() {
+  const pad = getGamepadState();
+  const keyboardJump = keyIsDown(87) || keyIsDown(38) || keyIsDown(32);
+
+  return keyboardJump || actionMobile.jump || pad.jump || pad.up;
 }
 
 function getInventoryScale() {
@@ -242,6 +559,7 @@ function touchStarted() {
       }
 
       if (dist(touch.x, touch.y, 140, height - 180) < 40 && player) {
+        actionMobile.jump = true;
         player.jump();
         playSound(click_Sound);
       }
@@ -271,6 +589,7 @@ function touchMoved() {
 
   if (touches.length > 0) {
     if (touchStartY - touches[0].y > 50) {
+      actionMobile.jump = true;
       player.jump();
       touchStartY = touches[0].y;
     }
@@ -290,6 +609,7 @@ function touchMoved() {
 function touchEnded() {
   actionMobile.left = false;
   actionMobile.right = false;
+  actionMobile.jump = false;
 
   return false;
 }

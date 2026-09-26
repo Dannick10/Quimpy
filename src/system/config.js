@@ -45,6 +45,7 @@ let multiplier = 1;
 let actionMobile = {
   left: false,
   right: false,
+  jump: false,
 };
 
 let touchStartY = 0;
@@ -59,6 +60,7 @@ let currentBGM = null;
 let settings = {
   sound: true,
   control: "keyboard",
+  movementMode: "analog",
   mobileControl: "swipe",
   autoJump: false,
   MODE: "NORMAL",

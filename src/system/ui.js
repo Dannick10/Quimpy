@@ -32,12 +32,18 @@ function drawMenu() {
   background(15, 25, 45);
   image(backgroundQuimpy, 0, 0, width, height);
 
-  for (let btn of getMenuButtons()) {
-    drawButton(btn.text, btn.x, btn.y, btn.template);
+  const buttons = getMenuButtons();
+  for (let i = 0; i < buttons.length; i++) {
+    const btn = buttons[i];
+    const isSelected =
+      settings.control === "gamepad" &&
+      getGamepadState().connected &&
+      menuNavigation.index === i;
+    drawButton(btn.text, btn.x, btn.y, btn.template, isSelected);
   }
 }
 
-function drawButton(texto, x, y, colors = buttonsTemplate.primary) {
+function drawButton(texto, x, y, colors = buttonsTemplate.primary, isSelected = false) {
   const w = 330;
   const h = 68;
 
@@ -55,13 +61,13 @@ function drawButton(texto, x, y, colors = buttonsTemplate.primary) {
   fill(...colors.shadow);
   rect(x + 5, y + 6, w, h, 10);
 
-  strokeWeight(4);
-  stroke(...colors.border);
+  strokeWeight(isSelected ? 6 : 4);
+  stroke(isSelected ? color(255, 245, 180) : colors.border);
   fill(...colors.background);
   rect(x, y + offset, w, h, 10);
 
   noStroke();
-  fill(...(hover ? colors.hover : colors.button));
+  fill(...(hover || isSelected ? colors.hover : colors.button));
   rect(x, y - 4 + offset, w - 8, h - 10, 8);
 
   fill(...colors.highlight);
@@ -216,8 +222,14 @@ function gameOver() {
     text(stats[i].value, width / 2 + 150, startY + i * spacing);
   }
 
-  for (let btn of getGameOverButtons()) {
-    drawButton(btn.text, btn.x, btn.y,  btn.template);
+  const buttons = getGameOverButtons();
+  for (let i = 0; i < buttons.length; i++) {
+    const btn = buttons[i];
+    const isSelected =
+      settings.control === "gamepad" &&
+      getGamepadState().connected &&
+      menuNavigation.index === i;
+    drawButton(btn.text, btn.x, btn.y, btn.template, isSelected);
   }
 
   rectMode(CORNER);
@@ -227,17 +239,30 @@ function drawSettings() {
   background(15, 20, 35);
   image(backgroundQuimpy, 0, 0, width, height);
 
-  for (let btn of getSettingsButtons()) {
-    drawButton(btn.text, btn.x, btn.y,  btn.template);
+  const buttons = getSettingsButtons();
+  for (let i = 0; i < buttons.length; i++) {
+    const btn = buttons[i];
+    const isSelected =
+      settings.control === "gamepad" &&
+      getGamepadState().connected &&
+      menuNavigation.index === i;
+    drawButton(btn.text, btn.x, btn.y, btn.template, isSelected);
   }
 }
+
 
 function drawGameMode() {
   background(15, 20, 35);
   image(backgroundQuimpy, 0, 0, width, height);
 
-  for (let btn of getOptionGameMode()) {
-    drawButton(btn.text, btn.x, btn.y,  btn.template);
+  const buttons = getOptionGameMode();
+  for (let i = 0; i < buttons.length; i++) {
+    const btn = buttons[i];
+    const isSelected =
+      settings.control === "gamepad" &&
+      getGamepadState().connected &&
+      menuNavigation.index === i;
+    drawButton(btn.text, btn.x, btn.y, btn.template, isSelected);
   }
 }
 
@@ -277,8 +302,14 @@ function drawInventary() {
 
   pop();
 
-  for (let btn of getInventoryButtons()) {
-    drawButton(btn.text, btn.x, btn.y,  btn.template);
+  const buttons = getInventoryButtons();
+  for (let i = 0; i < buttons.length; i++) {
+    const btn = buttons[i];
+    const isSelected =
+      settings.control === "gamepad" &&
+      getGamepadState().connected &&
+      menuNavigation.index === i;
+    drawButton(btn.text, btn.x, btn.y, btn.template, isSelected);
   }
 }
 

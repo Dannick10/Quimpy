@@ -14,6 +14,7 @@ class Player extends AnimatedEntity {
     this.autoJumpTimer = 0;
     this.autoJumpDuration = 20;
     this.hasGameOver = false;
+    this.jumpHeld = false;
     this.updateAnimation();
   }
 
@@ -84,12 +85,25 @@ class Player extends AnimatedEntity {
   }
 
   handleInput(targetSpeed) {
-    if (keyIsDown(68) || keyIsDown(39) || actionMobile.right) {
+    const movement = getMovementInput();
+
+    if (movement.right) {
       this.dx = targetSpeed;
-    } else if (keyIsDown(65) || keyIsDown(37) || actionMobile.left) {
+    } else if (movement.left) {
       this.dx = -targetSpeed;
     } else {
       this.dx = 0;
+    }
+
+    const shouldJump = getJumpInput();
+
+    if (shouldJump && !this.jumpHeld && this.canJump) {
+      this.jump();
+      this.jumpHeld = true;
+    }
+
+    if (!shouldJump) {
+      this.jumpHeld = false;
     }
   }
 
@@ -351,27 +365,18 @@ function updatePlayer() {
 function keyPressed() {
   let pressed = key.toLowerCase();
 
-  if (pressed === "w" || pressed === "arrowup") {
-    player.jump();
+  if (pressed === "w" || pressed === "arrowup" || pressed === " ") {
+    actionMobile.jump = true;
+  }
+}
 
-    if (player.canJump) {
-      if (speed <= 5) {
-        playSound(jump_cuteSound);
-      } else {
-        playSound(jump_longSound);
-      }
+function keyReleased() {
+  const pressed = key.toLowerCase();
 
-      createParticle(
-        player.x + player.width / 2,
-        player.y + player.height,
-        10,
-        color(255, 255, 255),
-        { min: -1, max: 1 },
-        { min: 1, max: 2 },
-        floor(random(5, 8)),
-        floor(random(20, 30)),
-        "jump",
-      );
+  if (pressed === "w" || pressed === "arrowup" || pressed === " ") {
+    actionMobile.jump = false;
+    if (player) {
+      player.jumpHeld = false;
     }
   }
 }
