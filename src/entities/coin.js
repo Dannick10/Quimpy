@@ -74,8 +74,6 @@ function buyCard(card) {
   money -= card.price;
   powerSystem.activatePower(card.hability);
 
-  cards = [];
-
   numTotalCardsCollect++;
 
   playSound(buyCard_Sound);
