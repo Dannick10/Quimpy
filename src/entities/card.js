@@ -474,55 +474,64 @@ function updateCardMenuSelection() {
 
   if (confirmPress && !cardMenuState.confirmHeld) {
     if (cardMenuState.focus === "close") {
-      cards.forEach((card) => {
-        const direction = random(-1, 1);
-        const powerX = random(CARD_EXIT_SPEED.minX, CARD_EXIT_SPEED.maxX) * (direction >= 0 ? 1 : -1);
-        const powerY = random(CARD_EXIT_SPEED.minY, CARD_EXIT_SPEED.maxY);
-        startCardExit(card, powerX, powerY);
-      });
-
-      cardMenuState.exitStarted = true;
-      cardMenuState.exitMode = "close";
-      cardMenuState.confirmHeld = true;
+      closeCardMenu();
       return;
     }
 
-    const chosenCard = cards[cardMenuState.selectedIndex];
-
-    if (!chosenCard) {
-      resetCardMenuState();
-      return;
-    }
-
-    if (money >= chosenCard.price) {
-      buyCard(chosenCard);
-
-      cards.forEach((card, index) => {
-        if (index === cardMenuState.selectedIndex) return;
-
-        const direction = card.x < width / 2 ? -1 : 1;
-        const exitVx = random(CARD_EXIT_SPEED.minX, CARD_EXIT_SPEED.maxX) * direction;
-        const exitVy = random(CARD_EXIT_SPEED.minY, CARD_EXIT_SPEED.maxY);
-        startCardExit(card, exitVx, exitVy);
-      });
-
-      cardMenuState.selectionStarted = true;
-      cardMenuState.selectionProgress = 0;
-      cardMenuState.selectionIndex = cardMenuState.selectedIndex;
-      cardMenuState.selectionBurstTriggered = false;
-      cardMenuState.confirmHeld = true;
-      return;
-    }
-
-    cardMessage = "você não tem peixes suficientes!";
-    cardMessageTimer = 120;
-
-    cardMenuState.confirmHeld = true;
+    purchaseSelectedCard(cardMenuState.selectedIndex);
   }
 
   if (!confirmPress) {
     cardMenuState.confirmHeld = false;
   }
+}
+
+function closeCardMenu() {
+  if (cards.length === 0) return;
+
+  cards.forEach((card) => {
+    const direction = random(-1, 1);
+    const powerX = random(CARD_EXIT_SPEED.minX, CARD_EXIT_SPEED.maxX) * (direction >= 0 ? 1 : -1);
+    const powerY = random(CARD_EXIT_SPEED.minY, CARD_EXIT_SPEED.maxY);
+    startCardExit(card, powerX, powerY);
+  });
+
+  cardMenuState.exitStarted = true;
+  cardMenuState.exitMode = "close";
+  cardMenuState.confirmHeld = true;
+}
+
+function purchaseSelectedCard(selectedIndex = cardMenuState.selectedIndex) {
+  const chosenCard = cards[selectedIndex];
+
+  if (!chosenCard) {
+    resetCardMenuState();
+    return;
+  }
+
+  if (money >= chosenCard.price) {
+    buyCard(chosenCard);
+
+    cards.forEach((card, index) => {
+      if (index === selectedIndex) return;
+
+      const direction = card.x < width / 2 ? -1 : 1;
+      const exitVx = random(CARD_EXIT_SPEED.minX, CARD_EXIT_SPEED.maxX) * direction;
+      const exitVy = random(CARD_EXIT_SPEED.minY, CARD_EXIT_SPEED.maxY);
+      startCardExit(card, exitVx, exitVy);
+    });
+
+    cardMenuState.selectionStarted = true;
+    cardMenuState.selectionProgress = 0;
+    cardMenuState.selectionIndex = selectedIndex;
+    cardMenuState.selectionBurstTriggered = false;
+    cardMenuState.confirmHeld = true;
+    return;
+  }
+
+  cardMessage = "você não tem peixes suficientes!";
+  cardMessageTimer = 120;
+  cardMenuState.confirmHeld = true;
 }
 
 function createCards() {

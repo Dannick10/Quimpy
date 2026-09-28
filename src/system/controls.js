@@ -647,7 +647,7 @@ function checkInteraction(tx, ty) {
 
   if (cards.length > 0) {
     if (tx > width - 80 && tx < width - 10 && ty > 20 && ty < 90) {
-      cards = [];
+      closeCardMenu();
       return;
     }
   }
@@ -655,7 +655,9 @@ function checkInteraction(tx, ty) {
   for (let i = cards.length - 1; i >= 0; i--) {
     let c = cards[i];
     if (tx > c.x && tx < c.x + c.sizeX && ty > c.y && ty < c.y + c.sizeY) {
-      buyCard(c);
+      cardMenuState.selectedIndex = i;
+      cardMenuState.focus = "card";
+      purchaseSelectedCard(i);
       break;
     }
   }
