@@ -221,7 +221,7 @@ function updateInventoryNavigation() {
   const moveRight = pad.right || keyIsDown(68) || keyIsDown(39);
   const moveUp = pad.up || keyIsDown(87) || keyIsDown(38);
   const moveDown = pad.down || keyIsDown(83) || keyIsDown(40);
-  const confirm = pad.jump || keyIsDown(13) || keyIsDown(90) || keyIsDown(65);
+  const confirm = pad.jump || keyIsDown(13) || keyIsDown(32) || keyIsDown(90);
 
   let items = getInventoryPageItems();
 
@@ -386,11 +386,9 @@ function updateMenuNavigation() {
 
   const pad = getGamepadState();
 
-  if (!pad.connected) return;
-
   const axisY = pad.axisY || 0;
-  const moveUp = pad.up || axisY < -0.5;
-  const moveDown = pad.down || axisY > 0.5;
+  const moveUp = pad.up || axisY < -0.5 || keyIsDown(87) || keyIsDown(38);
+  const moveDown = pad.down || axisY > 0.5 || keyIsDown(83) || keyIsDown(40);
 
   if (moveUp && !menuNavigation.upHeld) {
     menuNavigation.index = (menuNavigation.index - 1 + buttons.length) % buttons.length;
@@ -403,7 +401,7 @@ function updateMenuNavigation() {
   if (!moveUp) menuNavigation.upHeld = false;
   if (!moveDown) menuNavigation.downHeld = false;
 
-  const confirmPress = pad.jump || keyIsDown(13) || keyIsDown(90);
+  const confirmPress = pad.jump || keyIsDown(13) || keyIsDown(32) || keyIsDown(90);
 
   if (confirmPress && !menuNavigation.confirmHeld) {
     const button = buttons[menuNavigation.index];
@@ -500,7 +498,8 @@ function getMovementInput() {
 
 function getJumpInput() {
   const pad = getGamepadState();
-  const keyboardJump = keyIsDown(87) || keyIsDown(38) || keyIsDown(32);
+  const keyboardJump =
+    keyIsDown(87) || keyIsDown(38) || keyIsDown(13) || keyIsDown(32);
   const gamepadJump =
     settings.control === "gamepad" && pad.connected && (pad.jump || pad.up);
 
