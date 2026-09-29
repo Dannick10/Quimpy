@@ -15,6 +15,7 @@ class Player extends AnimatedEntity {
     this.autoJumpDuration = 20;
     this.hasGameOver = false;
     this.jumpHeld = false;
+    this.jumpBufferTimer = 0;
     this.updateAnimation();
   }
 
@@ -100,10 +101,23 @@ class Player extends AnimatedEntity {
     if (shouldJump && !this.jumpHeld && this.canJump) {
       this.jump();
       this.jumpHeld = true;
+      this.jumpBufferTimer = 0;
+    } else if (shouldJump && !this.jumpHeld) {
+      this.jumpBufferTimer = 8;
     }
 
     if (!shouldJump) {
       this.jumpHeld = false;
+    }
+
+    if (this.jumpBufferTimer > 0) {
+      if (this.canJump) {
+        this.jump();
+        this.jumpHeld = shouldJump;
+        this.jumpBufferTimer = 0;
+      } else {
+        this.jumpBufferTimer--;
+      }
     }
   }
 

@@ -455,8 +455,9 @@ function getMovementInput() {
   const pad = getGamepadState();
   const keyboardLeft = keyIsDown(65) || keyIsDown(37);
   const keyboardRight = keyIsDown(68) || keyIsDown(39);
+  const useGamepad = settings.control === "gamepad" && pad.connected;
 
-  if (pad.connected) {
+  if (useGamepad) {
     return {
       left: keyboardLeft || actionMobile.left || pad.left,
       right: keyboardRight || actionMobile.right || pad.right,
@@ -472,8 +473,10 @@ function getMovementInput() {
 function getJumpInput() {
   const pad = getGamepadState();
   const keyboardJump = keyIsDown(87) || keyIsDown(38) || keyIsDown(32);
+  const gamepadJump =
+    settings.control === "gamepad" && pad.connected && (pad.jump || pad.up);
 
-  return keyboardJump || actionMobile.jump || pad.jump || pad.up;
+  return keyboardJump || actionMobile.jump || gamepadJump;
 }
 
 function getInventoryScale() {
