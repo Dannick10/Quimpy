@@ -230,12 +230,20 @@ function updateInventoryNavigation() {
   }
 
   if (moveLeft && !inventoryNavigation.leftHeld) {
-    if (inventoryState.categories.length > 1) {
+    if (inventoryState.page > 0) {
+      inventoryState.page--;
+      items = getInventoryPageItems();
+      inventoryNavigation.selectedIndex = max(0, items.length - 1);
+      inventoryNavigation.focus = "items";
+    } else if (inventoryState.categories.length > 1) {
       inventoryState.categoryIndex =
         (inventoryState.categoryIndex - 1 + inventoryState.categories.length) %
         inventoryState.categories.length;
-      inventoryState.page = 0;
-      inventoryNavigation.selectedIndex = 0;
+      const categoryItems = inventoryState.items[getInventoryCategory()] || [];
+      const maxPage = max(0, ceil(categoryItems.length / inventoryState.perPage) - 1);
+      inventoryState.page = maxPage;
+      items = getInventoryPageItems();
+      inventoryNavigation.selectedIndex = max(0, items.length - 1);
       inventoryNavigation.focus = "items";
     }
     inventoryNavigation.leftHeld = true;
@@ -244,7 +252,14 @@ function updateInventoryNavigation() {
   }
 
   if (moveRight && !inventoryNavigation.rightHeld) {
-    if (inventoryState.categories.length > 1) {
+    const categoryItems = inventoryState.items[getInventoryCategory()] || [];
+    const maxPage = max(0, ceil(categoryItems.length / inventoryState.perPage) - 1);
+
+    if (inventoryState.page < maxPage) {
+      inventoryState.page++;
+      inventoryNavigation.selectedIndex = 0;
+      inventoryNavigation.focus = "items";
+    } else if (inventoryState.categories.length > 1) {
       inventoryState.categoryIndex =
         (inventoryState.categoryIndex + 1) % inventoryState.categories.length;
       inventoryState.page = 0;
@@ -263,6 +278,19 @@ function updateInventoryNavigation() {
       inventoryNavigation.focus = "items";
       inventoryNavigation.selectedIndex = 0;
       menuNavigation.index = 0;
+    } else if (inventoryNavigation.selectedIndex >= inventoryState.columns) {
+      inventoryNavigation.selectedIndex -= inventoryState.columns;
+    } else if (inventoryState.page > 0) {
+      inventoryState.page--;
+      items = getInventoryPageItems();
+      inventoryNavigation.selectedIndex = min(
+        items.length - 1,
+        max(
+          0,
+          items.length - inventoryState.columns +
+            (inventoryNavigation.selectedIndex % inventoryState.columns),
+        ),
+      );
     } else {
       inventoryNavigation.focus = "back";
       menuNavigation.index = 0;
@@ -685,6 +713,8 @@ function checkInventoryInteraction(tx, ty) {
       localY > pos.y &&
       localY < pos.y + layout.cardH
     ) {
+      inventoryNavigation.selectedIndex = i;
+      inventoryNavigation.focus = "items";
       inventoryState.selected[category.toLowerCase()] = items[i].id;
 
       if (player) {
@@ -708,6 +738,8 @@ function checkInventoryInteraction(tx, ty) {
     localY < pageY + buttonH
   ) {
     inventoryState.page = max(0, inventoryState.page - 1);
+    inventoryNavigation.selectedIndex = 0;
+    inventoryNavigation.focus = "items";
     playSound(click_Sound);
     return true;
   }
@@ -723,6 +755,8 @@ function checkInventoryInteraction(tx, ty) {
       ceil(inventoryState.items[category].length / inventoryState.perPage) - 1,
     );
     inventoryState.page = min(maxPage, inventoryState.page + 1);
+    inventoryNavigation.selectedIndex = 0;
+    inventoryNavigation.focus = "items";
     playSound(click_Sound);
     return true;
   }
@@ -743,6 +777,8 @@ function checkInventoryInteraction(tx, ty) {
     ) {
       inventoryState.categoryIndex = i;
       inventoryState.page = 0;
+      inventoryNavigation.selectedIndex = 0;
+      inventoryNavigation.focus = "items";
       playSound(click_Sound);
       return true;
     }
